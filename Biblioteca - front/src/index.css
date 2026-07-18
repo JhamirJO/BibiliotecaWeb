@@ -1,0 +1,112 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+:root {
+	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
+	color: black;
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+	--primary-color: rgb(79 70 229);
+	--secondary-color: #536684;
+	--secondary-hover-color: #a0acbd;
+	--tertiary-color: #2a354b;
+	--header-color: #2a354b;
+	--footer-color: #2a354b;
+	--table-header-color: rgb(79 70 229);
+	--button-primary-color: #4a5d7a;
+	--button-secundary-color: #687b9a;
+	--button-primary-hover-color: #687b9a;
+	--link-and-register: rgb(79 70 229);
+	--link-and-register-hover: rgb(99, 102, 241);
+	/* --fallback-b1: white; */
+	/* --table-header-color: #627087; */
+}
+
+a {
+	font-weight: 500;
+	color: var(--link-and-register);
+	text-decoration: inherit;
+}
+
+body {
+	margin: 0;
+	min-width: 320px;
+	min-height: 100vh;
+	width: 100%;
+}
+
+h1 {
+	font-size: 3.2em;
+	line-height: 1.1;
+}
+
+button {
+	border-radius: 8px;
+	border: 1px solid transparent;
+	padding: 0.6em 1.2em;
+	font-size: 1em;
+	font-weight: 500;
+	font-family: inherit;
+	/* background-color: #1a1a1a; */
+	cursor: pointer;
+	transition: border-color 0.25s;
+}
+/* El documento controla el scroll vertical.
+   No fijes #root a 100% ni uses overflow-x:hidden allí, porque crea
+   un contenedor de desplazamiento independiente. */
+html {
+  height: auto;
+  min-height: 100%;
+  overflow-x: clip;
+  overflow-y: auto;
+}
+
+body {
+  height: auto;
+  min-height: 100vh;
+  overflow: visible;
+}
+
+#root {
+  height: auto;
+  min-height: 100vh;
+  overflow: visible;
+}
+
+
+h3>img {
+	width: 24px;
+	height: 24px;
+}
+
+:root:has(:is(.modal-open, .modal:target, .modal-toggle:checked + .modal, .modal[open])) {
+	overflow: hidden;
+	scrollbar-gutter: auto;
+}
+
+.modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background-color: #0006 !important;
+	animation: modal-pop 0.2s ease-out;
+}
+
+@keyframes modal-pop {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
