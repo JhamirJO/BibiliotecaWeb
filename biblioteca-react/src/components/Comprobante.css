@@ -1,0 +1,94 @@
+/* ========= Comprobante (A5) ========= */
+:root{
+  /* Defaults (A5 normal) */
+  --sheet-padding: 12mm;   /* espacio interno en pantalla */
+  --page-margin: 10mm;     /* margen real al imprimir */
+  --print-gap: 6mm;        /* separación en grids para print */
+  --cell-pad: 3mm;         /* padding de celdas thead/tbody */
+  --base-font: 13px;       /* tamaño base en pantalla */
+  --print-font: 12px;      /* tamaño base en impresión */
+}
+
+/* Hoja base A5 (portrait: 148 × 210 mm) */
+.sheet {
+  width: 148mm;
+  min-height: 210mm;
+  background: #ffffff;
+  color: #0f172a; /* slate-900 */
+  box-shadow: 0 10px 25px rgba(0,0,0,.08);
+  border: 1px solid #e5e7eb; /* slate-200 */
+  border-radius: 10px;
+  padding: var(--sheet-padding);
+  font-size: var(--base-font);
+}
+
+.sheet h1, .sheet h2, .sheet h3 { margin: 0; }
+.avoid-break, .avoid-break * { break-inside: avoid; page-break-inside: avoid; }
+
+/* Utilidades suaves */
+.soft-bg { background: #f8fafc; }    /* slate-50 */
+.soft-header { background: #f1f5f9; }/* slate-100 */
+
+/* ====== Modo compacto (añade .compact a la hoja o usa ?compact=1 en tu JSX) ====== */
+.sheet.compact {
+  --sheet-padding: 8mm;
+  --page-margin: 8mm;
+  --print-gap: 4mm;
+  --cell-pad: 2mm;
+  --base-font: 12px;   /* pantalla compacta */
+  --print-font: 11px;  /* impresión compacta */
+}
+
+/* ========= Reglas de impresión ========= */
+@page {
+  /* A5 portrait */
+  size: A5 portrait;
+  margin: var(--page-margin);
+}
+
+@media print {
+  html, body {
+    background: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .no-print { display: none !important; }
+
+  .sheet {
+    box-shadow: none !important;
+    border: none !important;
+    width: auto !important;
+    min-height: auto !important;
+    padding: 0 !important; /* márgenes vienen de @page */
+    border-radius: 0 !important;
+    font-size: var(--print-font);
+  }
+
+  .grid-print-2 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: var(--print-gap) !important;
+  }
+
+  .print-table {
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+  .print-table th, .print-table td {
+    border-color: #e5e7eb !important;
+    padding: var(--cell-pad) !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+  }
+
+  /* Anchos sugeridos para A5 */
+  .col-id { width: 20mm !important; }
+  .col-fp { width: 32mm !important; }
+  .col-fm { width: 38mm !important; }
+}
+
+/* (Opcional) A5 en horizontal:
+@page { size: A5 landscape; }
+.sheet { width: 210mm; min-height: 148mm; }
+*/
