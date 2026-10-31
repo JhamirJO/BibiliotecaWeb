@@ -1,3 +1,4 @@
+import PageHeader from "@/components/layout/PageHeader";
 // src/general/pages/prestamo/Prestamo.jsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,9 +20,9 @@ export default function Prestamo() {
   } = useCrearPrestamo();
 
   // 🔹 Ahora leemos la lista general de préstamos del slice
-  const {
-    lista: prestamos = [],
-  } = useSelector((state) => state.prestamo ?? {});
+  const { lista: prestamos = [] } = useSelector(
+    (state) => state.prestamo ?? {},
+  );
 
   // Cargar siempre la lista (o si prefieres, solo cuando esté vacía)
   useEffect(() => {
@@ -139,142 +140,161 @@ export default function Prestamo() {
     !isLoading;
 
   return (
-    <div className="mx-auto w-full max-w-9xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-4">
-      <Card>
-        <CardHeader>
-          <h2 className="text-xl font-bold text-slate-900">Nuevo Préstamo</h2>
-        </CardHeader>
+    <div className="feature-page space-y-6">
+      <PageHeader
+        title="Préstamos"
+        description="Registra nuevos préstamos y consulta el historial de la biblioteca."
+      />
+      <div className="form-layout">
+        <Card>
+          <CardHeader>
+            <h2 className="text-xl font-bold text-slate-900">Nuevo Préstamo</h2>
+          </CardHeader>
 
-        <CardContent>
-          <form onSubmit={registrar} className="space-y-4">
-            {/* Fila 1: Fecha + DNI */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="form-control">
-                <label className="label">
-                  <span className="block text-sm font-medium text-slate-700 mb-1">
-                    Fecha de préstamo
-                  </span>
-                </label>
-                <Input
-                  type="date"
-                  name="fechaPrestamo"
-                  value={form.fechaPrestamo}
-                  onChange={(e) => setField("fechaPrestamo", e.target.value)}
-                  required
-                />
+          <CardContent>
+            <form onSubmit={registrar} className="space-y-4">
+              {/* Fila 1: Fecha + DNI */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="form-control">
+                  <label htmlFor="loan-date" className="label">
+                    <span className="block text-sm font-medium text-slate-700 mb-1">
+                      Fecha de préstamo
+                    </span>
+                  </label>
+                  <Input
+                    type="date"
+                    name="fechaPrestamo"
+                    id="loan-date"
+                    value={form.fechaPrestamo}
+                    onChange={(e) => setField("fechaPrestamo", e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label htmlFor="loan-dni" className="label">
+                    <span className="block text-sm font-medium text-slate-700 mb-1">
+                      DNI del lector
+                    </span>
+                  </label>
+                  <Input
+                    type="text"
+                    name="dni"
+                    id="loan-dni"
+                    placeholder="Ej. 12345678"
+                    value={form.dni}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, "").slice(0, 8);
+                      setField("dni", v);
+                    }}
+                    inputMode="numeric"
+                    maxLength={8}
+                    required
+                  />
+                </div>
               </div>
 
+              {/* Fila 2: IDs de publicaciones (chips) */}
               <div className="form-control">
-                <label className="label">
+                <label htmlFor="loan-publications" className="label">
                   <span className="block text-sm font-medium text-slate-700 mb-1">
-                    DNI del lector
+                    IDs de publicaciones (máx. 3)
                   </span>
                 </label>
-                <Input
-                  type="text"
-                  name="dni"
-                  placeholder="Ej. 12345678"
-                  value={form.dni}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/\D/g, "").slice(0, 8);
-                    setField("dni", v);
-                  }}
-                  inputMode="numeric"
-                  maxLength={8}
-                  required
-                />
+
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    name="publicacionInput"
+                    id="loan-publications"
+                    placeholder="Ej. 10234"
+                    value={form.publicacionInput}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/[^\d,]/g, "");
+                      setField("publicacionInput", v);
+                    }}
+                    onKeyDown={onEnterAdd}
+                    inputMode="numeric"
+                  />
+                  <button
+                    type="button"
+                    className="btn bg-slate-700 text-white hover:bg-slate-500"
+                    onClick={addPublicacion}
+                    disabled={form.publicacionIds.length >= 3}
+                    title={
+                      form.publicacionIds.length >= 3
+                        ? "Máximo 3 publicaciones"
+                        : "Agregar"
+                    }
+                  >
+                    Añadir
+                  </button>
+                </div>
+
+                {/* Chips */}
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {form.publicacionIds.map((id) => (
+                    <span key={id} className="badge badge-lg gap-2">
+                      {id}
+                      <button
+                        type="button"
+                        className="ml-1 btn btn-xs btn-ghost"
+                        onClick={() => removePublicacion(id)}
+                        aria-label={`Quitar ${id}`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+
+                <p className="mt-1 text-xs text-slate-500">
+                  Puedes añadir hasta 3 publicaciones. Presiona <kbd>Enter</kbd>{" "}
+                  para agregar rápidamente.
+                </p>
               </div>
-            </div>
 
-            {/* Fila 2: IDs de publicaciones (chips) */}
-            <div className="form-control">
-              <label className="label">
-                <span className="block text-sm font-medium text-slate-700 mb-1">
-                  IDs de publicaciones (máx. 3)
-                </span>
-              </label>
+              {/* Error al crear */}
+              {errorCrear && (
+                <div className="alert alert-error">
+                  <span>{String(errorCrear)}</span>
+                </div>
+              )}
 
-              <div className="flex gap-2">
-                <Input
-                  type="text"
-                  name="publicacionInput"
-                  placeholder="Ej. 10234"
-                  value={form.publicacionInput}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/[^\d,]/g, "");
-                    setField("publicacionInput", v);
-                  }}
-                  onKeyDown={onEnterAdd}
-                  inputMode="numeric"
-                />
+              {/* Acciones */}
+              <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
-                  className="btn bg-slate-700 text-white hover:bg-slate-500"
-                  onClick={addPublicacion}
-                  disabled={form.publicacionIds.length >= 3}
-                  title={
-                    form.publicacionIds.length >= 3
-                      ? "Máximo 3 publicaciones"
-                      : "Agregar"
-                  }
+                  className="btn"
+                  onClick={limpiar}
+                  disabled={isLoading}
                 >
-                  Añadir
+                  Limpiar
+                </button>
+                <button
+                  type="submit"
+                  className={`btn bg-slate-700 text-white ${
+                    isLoading ? "loading" : ""
+                  }`}
+                  disabled={!canSubmit}
+                >
+                  {isLoading ? "Registrando…" : "Registrar préstamo"}
                 </button>
               </div>
-
-              {/* Chips */}
-              <div className="mt-2 flex flex-wrap gap-2">
-                {form.publicacionIds.map((id) => (
-                  <span key={id} className="badge badge-lg gap-2">
-                    {id}
-                    <button
-                      type="button"
-                      className="ml-1 btn btn-xs btn-ghost"
-                      onClick={() => removePublicacion(id)}
-                      aria-label={`Quitar ${id}`}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-
-              <p className="mt-1 text-xs text-slate-500">
-                Puedes añadir hasta 3 publicaciones. Presiona{" "}
-                <kbd>Enter</kbd> para agregar rápidamente.
-              </p>
-            </div>
-
-            {/* Error al crear */}
-            {errorCrear && (
-              <div className="alert alert-error">
-                <span>{String(errorCrear)}</span>
-              </div>
-            )}
-
-            {/* Acciones */}
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                type="button"
-                className="btn"
-                onClick={limpiar}
-                disabled={isLoading}
-              >
-                Limpiar
-              </button>
-              <button
-                type="submit"
-                className={`btn bg-slate-700 text-white ${
-                  isLoading ? "loading" : ""
-                }`}
-                disabled={!canSubmit}
-              >
-                {isLoading ? "Registrando…" : "Registrar préstamo"}
-              </button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </form>
+          </CardContent>
+        </Card>
+        <aside className="form-note">
+          <span className="eyebrow">Antes de registrar</span>
+          <h3>Verifica los datos del préstamo.</h3>
+          <p>Revisa el DNI del lector y los códigos de las publicaciones.</p>
+          <ul>
+            <li>Máximo 3 publicaciones por préstamo.</li>
+            <li>Plazo máximo de 7 días.</li>
+            <li>Al registrar se genera un comprobante.</li>
+          </ul>
+        </aside>
+      </div>
 
       {/* Tabla (usa lista general de préstamos) */}
       <Card>

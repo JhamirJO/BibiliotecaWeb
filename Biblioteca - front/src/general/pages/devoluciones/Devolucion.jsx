@@ -1,7 +1,7 @@
+import PageHeader from "@/components/layout/PageHeader";
 // src/features/devolucion/Devolucion.jsx
 import React, { useState, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import Card, { CardHeader, CardContent } from "../../../components/Card";
 import Input from "@/components/Input";
 import Swal from "sweetalert2";
 import { todayYMD, isValidYMD } from "@/utils/date";
@@ -51,7 +51,7 @@ export default function Devolucion() {
       isValidYMD(form.fechaIdp) &&
       /^\d+$/.test(form.prestamoId) &&
       Number(form.prestamoId) > 0,
-    [form.fechaIdp, form.prestamoId]
+    [form.fechaIdp, form.prestamoId],
   );
 
   const validarComp = useMemo(
@@ -59,7 +59,7 @@ export default function Devolucion() {
       isValidYMD(form.fechaComp) &&
       /^\d+$/.test(form.comprobanteId) &&
       Number(form.comprobanteId) > 0,
-    [form.fechaComp, form.comprobanteId]
+    [form.fechaComp, form.comprobanteId],
   );
 
   const canSubmit = (modo === "idp" ? validarIdp : validarComp) && !isLoading;
@@ -134,158 +134,89 @@ export default function Devolucion() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-9xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-4">
-      {/* Cabecera */}
-      <Card>
-        <CardHeader>
-          <h1 className="text-xl font-bold text-slate-900">Registrar Devolución</h1>
-        </CardHeader>
-        <CardContent>
-          <p className="mt-1 text-slate-600">
-            Realiza devoluciones por <strong>código de préstamo</strong> o por <strong>comprobante</strong> (bloque).
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Formulario para ambos modos */}
-      <form onSubmit={registrar} className="space-y-4">
-        {/* Dos cards en responsive */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* IZQUIERDA: por ID de préstamo */}
-          <Card
-            className={`transition ring-offset-2 ${
-              modo === "idp" ? "ring-1 ring-[#104e75]" : "ring-0"
-            }`}
-          >
-            <CardHeader>
-              <h2 className="text-xl font-bold text-slate-900">
-                Devolución con Código de Préstamo
-              </h2>
-            </CardHeader>
-            <CardContent onFocus={() => setModo("idp")} onClick={() => setModo("idp")}>
-              <div className="grid grid-cols-1 gap-4">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="block text-sm font-medium text-slate-700 mb-1">
-                      Fecha de devolución
-                    </span>
-                  </label>
-                  <Input
-                    type="date"
-                    name="fechaIdp"
-                    value={form.fechaIdp}
-                    onChange={onChange}
-                    required={modo === "idp"}
-                    disabled={modo !== "idp"}
-                  />
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="block text-sm font-medium text-slate-700 mb-1">
-                      Código de préstamo
-                    </span>
-                  </label>
-                  <Input
-                    type="text"
-                    name="prestamoId"
-                    placeholder="Ej. 900123"
-                    value={form.prestamoId}
-                    onChange={(e) => {
-                      const v = e.target.value.replace(/\D/g, "");
-                      setForm((f) => ({ ...f, prestamoId: v }));
-                    }}
-                    inputMode="numeric"
-                    required={modo === "idp"}
-                    disabled={modo !== "idp"}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* DERECHA: por comprobante */}
-          <Card
-            className={`transition ring-offset-2 ${
-              modo === "comp" ? "ring-1 ring-[#104e75]" : "ring-0"
-            }`}
-          >
-            <CardHeader>
-              <h2 className="text-xl font-bold text-slate-900">Devolución por Comprobante</h2>
-            </CardHeader>
-            <CardContent onFocus={() => setModo("comp")} onClick={() => setModo("comp")}>
-              <div className="grid grid-cols-1 gap-4">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="block text-sm font-medium text-slate-700 mb-1">
-                      Fecha de devolución
-                    </span>
-                  </label>
-                  <Input
-                    type="date"
-                    name="fechaComp"
-                    value={form.fechaComp}
-                    onChange={onChange}
-                    required={modo === "comp"}
-                    disabled={modo !== "comp"}
-                  />
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="block text-sm font-medium text-slate-700 mb-1">
-                      ID de comprobante
-                    </span>
-                  </label>
-                  <Input
-                    type="text"
-                    name="comprobanteId"
-                    placeholder="Ej. 42"
-                    value={form.comprobanteId}
-                    onChange={(e) => {
-                      const v = e.target.value.replace(/\D/g, "");
-                      setForm((f) => ({ ...f, comprobanteId: v }));
-                    }}
-                    inputMode="numeric"
-                    required={modo === "comp"}
-                    disabled={modo !== "comp"}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Error global del hook */}
-        {error && (
-          <div className="alert alert-error">
-            <span>{String(error)}</span>
-          </div>
-        )}
-
-        {/* Botonera */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div className="join">
-            <button
-              type="button"
-              className={`btn join-item ${modo === "idp" ? "bg-slate-700 text-white hover:bg-slate-500" : ""}`}
-              onClick={() => setModo("idp")}
+    <div className="feature-page">
+      <PageHeader
+        title="Devoluciones"
+        description="Registra la entrega del material por código de préstamo o por comprobante."
+      />
+      <div className="form-layout">
+        <form className="panel return-panel" onSubmit={registrar}>
+          <div className="return-panel__body">
+            <h2>Identifica la devolución</h2>
+            <p className="form-help">
+              Selecciona cómo deseas registrar la entrega del material.
+            </p>
+            <div
+              className="segmented-control"
+              role="group"
+              aria-label="Modo de devolución"
             >
-              Código de Préstamo
-            </button>
-            <button
-              type="button"
-              className={`btn join-item ${modo === "comp" ? "bg-slate-700 text-white hover:bg-slate-500" : ""}`}
-              onClick={() => setModo("comp")}
-            >
-              Comprobante
-            </button>
+              <button
+                type="button"
+                aria-pressed={modo === "idp"}
+                onClick={() => setModo("idp")}
+              >
+                Por préstamo
+              </button>
+              <button
+                type="button"
+                aria-pressed={modo === "comp"}
+                onClick={() => setModo("comp")}
+              >
+                Por comprobante
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="label" htmlFor="return-code">
+                  {modo === "idp"
+                    ? "Código de préstamo"
+                    : "Número de comprobante"}
+                </label>
+                <Input
+                  id="return-code"
+                  type="text"
+                  name={modo === "idp" ? "prestamoId" : "comprobanteId"}
+                  inputMode="numeric"
+                  value={modo === "idp" ? form.prestamoId : form.comprobanteId}
+                  placeholder={modo === "idp" ? "Ej. 900123" : "Ej. 42"}
+                  required
+                  onChange={(event) => {
+                    const key = modo === "idp" ? "prestamoId" : "comprobanteId";
+                    const value = event.target.value.replace(/\D/g, "");
+                    setForm((current) => ({ ...current, [key]: value }));
+                  }}
+                />
+              </div>
+              <div>
+                <label className="label" htmlFor="return-date">
+                  Fecha de devolución
+                </label>
+                <Input
+                  id="return-date"
+                  type="date"
+                  name={modo === "idp" ? "fechaIdp" : "fechaComp"}
+                  value={modo === "idp" ? form.fechaIdp : form.fechaComp}
+                  onChange={onChange}
+                  required
+                />
+              </div>
+            </div>
+            <p className="form-help">
+              {modo === "idp"
+                ? "La devolución se aplicará a la publicación del préstamo indicado."
+                : "La devolución se aplicará a las publicaciones asociadas al comprobante."}
+            </p>
+            {error && (
+              <div className="alert alert-error" role="alert">
+                {String(error)}
+              </div>
+            )}
           </div>
-
-          <div className="flex justify-end gap-3">
+          <footer className="form-actions">
             <button
               type="button"
-              className="btn bg-white hover:bg-neutral-content"
+              className="btn"
               onClick={limpiar}
               disabled={isLoading}
             >
@@ -293,14 +224,26 @@ export default function Devolucion() {
             </button>
             <button
               type="submit"
-              className={`btn bg-slate-700 text-white ${isLoading ? "loading" : ""}`}
+              className="btn btn-primary"
               disabled={!canSubmit}
             >
               {isLoading ? "Registrando…" : "Registrar devolución"}
             </button>
-          </div>
-        </div>
-      </form>
+          </footer>
+        </form>
+        <aside className="form-note">
+          <span className="eyebrow">Devoluciones</span>
+          <h3>Dos formas de registrar.</h3>
+          <p>
+            <strong>Por préstamo:</strong> utiliza el código para devolver una
+            publicación.
+            <br />
+            <br />
+            <strong>Por comprobante:</strong> registra la devolución de las
+            publicaciones asociadas.
+          </p>
+        </aside>
+      </div>
     </div>
   );
 }

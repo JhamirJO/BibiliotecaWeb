@@ -1,21 +1,42 @@
+import { Link } from "react-router-dom";
+import LoginForm from "./LoginForm";
+import Brand from "@/components/layout/Brand";
+import interior from "@/assets/media/biblioteca-interior.jpg";
 
-import LoginForm from "@/general/pages/Login/LoginForm";
-
-import portada from '../../../img/Biblio.png';
-
-
-const LoginPage = () => {
-   
-
-    return (
-        <div className="h-screen flex flex-row">
-            <img src={portada} alt="portada" className="w-1/2 hidden md:block" />
-            <div className="flex flex-col w-full">
-                <LoginForm/>
-
+export default function LoginPage() {
+  return (
+    <div className="login-site">
+      <header className="login-top">
+        <Brand />
+        <Link className="text-link" to="/home">
+          Volver al inicio
+        </Link>
+      </header>
+      <main className="login-layout">
+        <section className="login-form-side">
+          <LoginForm />
+        </section>
+        <section className="login-photo">
+          <img src={interior} alt="Interior de biblioteca" />
+          <div className="login-story">
+            <span className="eyebrow">Un espacio para aprender</span>
+            <div>
+              <h2>
+                El conocimiento
+                <br />
+                se construye
+                <br />
+                leyendo.
+              </h2>
+              <p>
+                Consulta nuestras publicaciones y lleva el seguimiento de tus
+                préstamos.
+              </p>
             </div>
-        </div>
-    );
-};
-
-export default LoginPage;
+            <small>Universidad Nacional Mayor de San Marcos</small>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}

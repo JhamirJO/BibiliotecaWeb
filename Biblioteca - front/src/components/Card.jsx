@@ -37,12 +37,12 @@ const Card = forwardRef(function Card(
     elevation = "md",
     padding = "md",
     rounded = "lg",
-    interactive = false,          // hover suave opcional
+    interactive = false, // hover suave opcional
     className = "",
     children,
     ...rest
   },
-  ref
+  ref,
 ) {
   const Component = Tag;
   return (
@@ -54,8 +54,8 @@ const Card = forwardRef(function Card(
         PADDING[padding],
         ROUNDED[rounded],
         interactive ? "transition-shadow hover:shadow-md" : "",
-        "min-w-0", // evita overflow en grids
-        className
+        "ui-card min-w-0", // evita overflow en grids
+        className,
       )}
       {...rest}
     >
@@ -68,8 +68,10 @@ const Card = forwardRef(function Card(
 export const CardHeader = ({ className = "", children }) => (
   <div className={cx("mb-3", className)}>{children}</div>
 );
-export const CardContent = ({ className = "", children }) => (
-  <div className={className}>{children}</div>
+export const CardContent = ({ className = "", children, ...props }) => (
+  <div className={className} {...props}>
+    {children}
+  </div>
 );
 export const CardFooter = ({ className = "", children }) => (
   <div className={cx("mt-4", className)}>{children}</div>

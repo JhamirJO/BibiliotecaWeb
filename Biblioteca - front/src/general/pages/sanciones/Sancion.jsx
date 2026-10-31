@@ -1,3 +1,4 @@
+import PageHeader from "@/components/layout/PageHeader";
 // src/pages/Sancion.jsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +13,7 @@ export default function Sancion() {
   const dispatch = useDispatch();
 
   const { lector: lectores = [], cargando } = useSelector(
-    (state) => state.lector || {}
+    (state) => state.lector || {},
   );
 
   const [dni, setDni] = useState("");
@@ -44,7 +45,7 @@ export default function Sancion() {
     }
 
     const encontrado = (lectores || []).find(
-      (row) => row.persona?.dni === dniTrim
+      (row) => row.persona?.dni === dniTrim,
     );
 
     if (!encontrado) {
@@ -83,7 +84,11 @@ export default function Sancion() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-9xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-4">
+    <div className="feature-page space-y-6">
+      <PageHeader
+        title="Sanciones"
+        description="Consulta el estado de un lector y gestiona el levantamiento de su sanción."
+      />
       {/* Card: buscar por DNI */}
       <Card>
         <CardHeader>
@@ -96,7 +101,7 @@ export default function Sancion() {
           </p>
         </CardHeader>
         <CardContent>
-          <label className="label">
+          <label htmlFor="sanction-dni" className="label">
             <span className="block text-sm font-medium text-slate-700 mb-1">
               DNI del lector
             </span>
@@ -106,6 +111,7 @@ export default function Sancion() {
               type="text"
               value={dni}
               onChange={(e) => setDni(e.target.value)}
+              id="sanction-dni"
               placeholder="Ej. 87732321"
             />
             <button
@@ -117,11 +123,7 @@ export default function Sancion() {
               {cargando ? "Cargando..." : "Buscar"}
             </button>
           </div>
-          {error && (
-            <p className="mt-2 text-sm text-red-600">
-              {error}
-            </p>
-          )}
+          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
         </CardContent>
       </Card>
 
@@ -162,6 +164,11 @@ export default function Sancion() {
 
               <hr className="border-slate-100" />
 
+              {sancionSuccess && (
+                <p role="status" className="text-sm text-emerald-600">
+                  Sanción levantada correctamente.
+                </p>
+              )}
               {/* Detalle de sanción solo si estaba sancionado */}
               {estadoLector === "SANCIONADO" ? (
                 <>
@@ -188,14 +195,7 @@ export default function Sancion() {
 
                     {/* mensajes del hook */}
                     {sancionError && (
-                      <p className="text-sm text-red-600">
-                        {sancionError}
-                      </p>
-                    )}
-                    {sancionSuccess && (
-                      <p className="text-sm text-emerald-600">
-                        Sanción levantada correctamente.
-                      </p>
+                      <p className="text-sm text-red-600">{sancionError}</p>
                     )}
                   </div>
                 </>

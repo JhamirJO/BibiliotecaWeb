@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 const FALLBACK_KEY = "session/countdownEndsAt"; // por si no hay exp
@@ -33,7 +33,6 @@ export function useSesion() {
   }, [exp]);
 
   const [now, setNow] = useState(Date.now());
-  const raf = useRef(null);
   const tick = () => {
     // 1Hz sin drift, basado en fecha real
     setNow(Date.now());

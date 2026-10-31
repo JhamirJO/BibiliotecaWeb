@@ -1,11 +1,12 @@
 // src/dashboard/Dashboard.jsx
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Sidebar from "../dashboard/Sidebar";
-import "./Dashboard.css";
+import Brand from "@/components/layout/Brand";
+import { Link } from "react-router-dom";
 import { Icons } from "@/utils/Icons";
 import { Outlet, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { getBreadcrumbParts } from "@/utils/navConfig";
+import { getBreadcrumbParts, getDefaultDashboardPath } from "@/utils/navConfig";
 import { useLogout } from "@/general/hooks/useLogout";
 import { useSesion } from "@/general/hooks/useSesion";
 import NotificationDropdown from "@/components/NotificationDropdown";
@@ -15,6 +16,8 @@ import {
   marcarNotificacionComoLeida,
   marcarTodasNotificacionesComoLeidas,
 } from "@/actions/notificacionThunks";
+
+const EMPTY_NOTIFICATIONS = [];
 
 function formatTimeAgo(isoString) {
   if (!isoString) return "";
@@ -35,37 +38,53 @@ function formatTimeAgo(isoString) {
 
 export default function Dashboard() {
   const location = useLocation();
-  const drawerId = "app-drawer";
   const role = useSelector((s) => s.auth?.role);
   const logout = useLogout();
   const dispatch = useDispatch();
 
-  const { section, page } = getBreadcrumbParts(location.pathname, role);
+  const { page } = getBreadcrumbParts(location.pathname, role);
 
-  const [isOpen, setIsOpen] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(min-width: 1024px)").matches
-  );
-
+  const [isOpen, setIsOpen] = useState(false);
+  const username = useSelector((state) => state.auth?.username) || "Usuario";
+  const isReader = role === "LECTOR";
+  const roleLabel =
+    {
+      ADMIN: "Administrador",
+      BIBLIOTECARIO: "Bibliotecario",
+      LECTOR: "Lector",
+    }[role] || role;
+  const initials = username
+    .split(/[.\s_-]+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
   const { hhmmss, expired } = useSesion();
   useEffect(() => {
     if (expired) logout();
   }, [expired, logout]);
 
   useEffect(() => {
-    const mql = window.matchMedia("(min-width: 1024px)");
-    const onChange = (e) => {
-      if (e.matches) setIsOpen(true);
+    const onKey = (event) => {
+      if (event.key === "Escape") setIsOpen(false);
     };
-    mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
+    const media = window.matchMedia("(min-width: 801px)");
+    const onResize = () => {
+      if (media.matches) setIsOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    media.addEventListener("change", onResize);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      media.removeEventListener("change", onResize);
+    };
   }, []);
 
   // 🔍 Slice de notificaciones
   const notificacionState = useSelector((s) => s.notificacion);
-  const notificaciones   = notificacionState?.notificaciones ?? [];
-  const noLeidasCount    = notificacionState?.noLeidasCount ?? 0;
+  const notificaciones =
+    notificacionState?.notificaciones ?? EMPTY_NOTIFICATIONS;
+  const noLeidasCount = notificacionState?.noLeidasCount ?? 0;
   const estaCargandoNoti = notificacionState?.estaCargandoNoti ?? false;
 
   // 🔁 Polling de notificaciones (solo no leídas)
@@ -84,10 +103,13 @@ export default function Dashboard() {
     return () => clearInterval(intervalId);
   }, [dispatch]);
 
-  const handleNotificationClick = (n) => {
-    // n.id viene del objeto que armamos en notificationsForDropdown
-    dispatch(marcarNotificacionComoLeida(n.id));
-  };
+  const handleNotificationClick = useCallback(
+    (n) => {
+      // n.id viene del objeto que armamos en notificationsForDropdown
+      dispatch(marcarNotificacionComoLeida(n.id));
+    },
+    [dispatch],
+  );
 
   const handleMarkAllRead = () => {
     dispatch(marcarTodasNotificacionesComoLeidas());
@@ -97,10 +119,10 @@ export default function Dashboard() {
     () =>
       (notificaciones ?? []).map((n) => {
         const payload = n.payload || {};
-        const tituloPub   = payload.titulo_publicacion || "Publicación";
-        const fechaVenc   = payload.fecha_vencimiento || "";
-        const diasRest    = payload.dias_restantes;
-        const diasAtraso  = payload.dias_atraso;
+        const tituloPub = payload.titulo_publicacion || "Publicación";
+        const fechaVenc = payload.fecha_vencimiento || "";
+        const diasRest = payload.dias_restantes;
+        const diasAtraso = payload.dias_atraso;
 
         let etiqueta = "";
         let mensaje = "";
@@ -147,81 +169,94 @@ export default function Dashboard() {
           tipo: n.tipo,
           etiqueta,
           mensaje,
-          variant,                    // 👈 para estilos en el dropdown
+          variant, // 👈 para estilos en el dropdown
           hace: formatTimeAgo(n.createdAt),
           onClick: handleNotificationClick,
           raw: n,
         };
       }),
-    [notificaciones] // eslint-disable-line react-hooks/exhaustive-deps
+    [notificaciones, handleNotificationClick],
   );
 
   return (
-    <div className={`drawer ${isOpen ? "drawer-open" : ""} min-h-screen`}>
-      <input
-        id={drawerId}
-        type="checkbox"
-        className="drawer-toggle"
-        checked={isOpen}
-        readOnly
-      />
-
-      <div className="drawer-content flex min-h-screen min-w-0 flex-col">
-        {/* Topbar */}
-        <div className="topbar w-full max-w-full h-14 shrink-0">
-          <div className="flex-none">
+    <div className={`workspace${isReader ? " workspace--reader" : ""}`}>
+      <a className="skip-link" href="#main-content">
+        Saltar al contenido
+      </a>
+      <header className="workspace-header">
+        <div className="workspace-header__inner">
+          {!isReader && (
             <button
-              className="topbar__btn"
-              onClick={() => setIsOpen((v) => !v)}
-              aria-label="Abrir menú"
+              className="header-icon mobile-menu"
+              onClick={() => setIsOpen((open) => !open)}
+              aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={isOpen}
+              aria-controls="workspace-navigation"
             >
-              <Icons.Menu className="topbar__btn h-6 w-6" />
+              <Icons.Menu size={22} />
             </button>
-          </div>
-
-          <div className="flex-1 pl-2">
-            <span className="text-slate-500 font-medium">{section}</span>
-            <span className="text-slate-300 mx-2">/</span>
-            <span className="text-slate-900 font-semibold">{page}</span>
-          </div>
-
-          {/* 🔔 Notificaciones + ⏱️ Contador */}
-          <div className="flex items-center gap-3 mr-2">
+          )}
+          <Brand inverse to={getDefaultDashboardPath(role)} />
+          {isReader ? (
+            <Sidebar reader onNavigate={() => setIsOpen(false)} />
+          ) : (
+            <span className="workspace-caption">Gestión bibliotecaria</span>
+          )}
+          <div className="workspace-actions">
             <NotificationDropdown
               notifications={notificationsForDropdown}
               badgeCount={noLeidasCount}
               loading={estaCargandoNoti}
               onMarkAllRead={handleMarkAllRead}
             />
-
-            <span
-              className="inline-flex items-center rounded-lg px-3 py-1 text-xl font-semibold
-                         bg-zinc-50 text-slate-700"
+            <div
+              className="session-countdown"
               title="Tiempo restante de sesión"
             >
-              {hhmmss}
-            </span>
-          </div>
-
-          <div className="flex-none">
+              <span>Sesión restante</span>
+              <strong>{hhmmss}</strong>
+            </div>
+            <Link to="/dashboard/perfil" className="account-link">
+              <span className="account-avatar">{initials}</span>
+              <span className="account-label">
+                <strong>{username}</strong>
+                <small>{roleLabel}</small>
+              </span>
+            </Link>
             <button
-              className="topbar__btn"
-              aria-label="Salir"
+              className="header-icon"
+              aria-label="Cerrar sesión"
               onClick={logout}
             >
-              <Icons.ExitDoor className="h-7 w-7" />
+              <Icons.ExitDoor size={21} strokeWidth={1.7} />
             </button>
           </div>
         </div>
-
-        <main className="main__wrap flex-1 bg-slate-100">
-          <div className="content-scroll-x w-full overflow-x-auto">
-            <Outlet />
-          </div>
-        </main>
-      </div>
-
-      <Sidebar drawerId={drawerId} />
+      </header>
+      {!isReader && (
+        <>
+          <Sidebar isOpen={isOpen} onNavigate={() => setIsOpen(false)} />
+          {isOpen && (
+            <button
+              className="navigation-backdrop"
+              onClick={() => setIsOpen(false)}
+              aria-label="Cerrar menú"
+            />
+          )}
+        </>
+      )}
+      <main
+        id="main-content"
+        className="workspace-main"
+        data-view={location.pathname.split("/").pop()}
+        aria-label={page}
+      >
+        <Outlet />
+      </main>
+      <footer className="workspace-footer">
+        <span>Biblioteca · Universidad Nacional Mayor de San Marcos</span>
+        <span>© {new Date().getFullYear()} · Portal bibliotecario</span>
+      </footer>
     </div>
   );
 }

@@ -24,7 +24,7 @@ export default function PrestamosPorLectorChart({ data }) {
         padding={0.3}
         valueScale={{ type: "linear" }}
         indexScale={{ type: "band", round: true }}
-        colors="#415d8aff"
+        colors="#8c815f"
         borderRadius={3}
         borderWidth={1}
         borderColor={{ from: "color", modifiers: [["darker", 0.4]] }}
@@ -42,14 +42,12 @@ export default function PrestamosPorLectorChart({ data }) {
         labelSkipHeight={16}
         labelTextColor="#f5f5f5ff"
         theme={{
-          textColor: "#0f172a",
+          textColor: "#182b43",
           tooltip: { container: { background: "white", fontSize: 12 } },
         }}
         tooltip={({ data, value }) => (
           <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 w-72">
-            <div className="font-semibold mb-1">
-              {data.nombreCompleto}
-            </div>
+            <div className="font-semibold mb-1">{data.nombreCompleto}</div>
             <div>{value} préstamos</div>
             <div className="text-[11px] text-slate-500 mt-1">
               DNI: {data.dni}

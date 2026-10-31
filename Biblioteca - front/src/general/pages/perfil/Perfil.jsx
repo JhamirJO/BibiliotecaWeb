@@ -1,3 +1,4 @@
+import PageHeader from "@/components/layout/PageHeader";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Card from "@/components/Card";
@@ -8,7 +9,7 @@ import {
   MailIcon,
   PhoneIcon,
   PasswordIcon,
-} from "@/utils/icons";
+} from "@/utils/Icons";
 import { Link } from "react-router-dom";
 import { getLectorPerfil } from "@/actions/lectorThunks";
 import { getBibliotecarioPerfil } from "@/actions/bibliotecarioThunks";
@@ -74,7 +75,6 @@ export default function Perfil() {
     perfilBibliotecario,
   ]);
 
-
   // 2) Elegir el perfil según rol
   const registro = useMemo(() => {
     if (isLector) return perfilLector;
@@ -104,7 +104,12 @@ export default function Perfil() {
   const error = errorLector || errorBibliotecario;
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">
+    <div className="feature-page">
+      <PageHeader
+        title="Mi perfil"
+        description="Consulta tu información personal y los datos de acceso."
+        section="Cuenta"
+      />
       <Card>
         <div className="p-6">
           {/* Encabezado */}

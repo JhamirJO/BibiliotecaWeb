@@ -3,9 +3,9 @@ import { ResponsiveBar } from "@nivo/bar";
 
 // Colores fijos por tipo de publicación
 const colorPorTipo = {
-  LIBRO: "#f97316",
-  ARTICULO: "#018f35ff",
-  TESIS: "#415d8aff", 
+  LIBRO: "#176d78",
+  ARTICULO: "#54759a",
+  TESIS: "#8c815f",
   SIN_TIPO: "#6b7280",
 };
 
@@ -23,26 +23,22 @@ export default function TopPublicacionesChart({ data }) {
   // Tipos únicos para la leyenda
   const tiposUnicos = Array.from(new Set(data.map((d) => d.tipo))).sort();
 
-  const dataOrdenada = [...data].sort(
-    (a, b) => a.prestamos - b.prestamos
-  );
+  const dataOrdenada = [...data].sort((a, b) => a.prestamos - b.prestamos);
 
   return (
     <div className="h-80 w-full flex flex-col">
       {/* Gráfico */}
       <div className="flex-1">
         <ResponsiveBar
-          data={dataOrdenada} 
+          data={dataOrdenada}
           keys={["prestamos"]}
-          indexBy="tituloEje" 
+          indexBy="tituloEje"
           layout="horizontal"
           margin={{ top: 10, right: 20, bottom: 50, left: 130 }} // 👈 más margen izquierdo
           padding={0.3}
           valueScale={{ type: "linear" }}
           indexScale={{ type: "band", round: true }}
-          colors={(bar) =>
-            colorPorTipo[bar.data.tipo] || "#2563eb"
-          } // 👈 color por tipo
+          colors={(bar) => colorPorTipo[bar.data.tipo] || "#176d78"} // 👈 color por tipo
           borderRadius={3}
           borderWidth={1}
           borderColor={{ from: "color", modifiers: [["darker", 0.4]] }}
@@ -66,7 +62,7 @@ export default function TopPublicacionesChart({ data }) {
           labelSkipHeight={16}
           labelTextColor="#f5f5f5ff"
           theme={{
-            textColor: "#0f172a",
+            textColor: "#182b43",
             axis: {
               ticks: {
                 text: { fontSize: 11 },
@@ -83,9 +79,7 @@ export default function TopPublicacionesChart({ data }) {
             <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 w-[250px]">
               {/* 👆 max-w-md para hacerlo más ancho */}
               <div className="font-semibold mb-1">{data.titulo}</div>
-              <div className="text-slate-500 text-[11px] mb-1">
-                {data.tipo}
-              </div>
+              <div className="text-slate-500 text-[11px] mb-1">{data.tipo}</div>
               <div>{value} préstamos</div>
             </div>
           )}
@@ -102,7 +96,7 @@ export default function TopPublicacionesChart({ data }) {
             <span
               className="h-2.5 w-2.5 rounded-full"
               style={{
-                backgroundColor: colorPorTipo[tipo] || "#2563eb",
+                backgroundColor: colorPorTipo[tipo] || "#176d78",
               }}
             />
             <span>{tipo}</span>

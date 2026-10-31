@@ -2,9 +2,9 @@
 import { ResponsiveLine } from "@nivo/line";
 
 const colorPorTipo = {
-  LIBRO: "#f97316",
-  ARTICULO: "#018f35ff",
-  TESIS: "#155ed4ff",
+  LIBRO: "#176d78",
+  ARTICULO: "#54759a",
+  TESIS: "#8c815f",
   SIN_TIPO: "#6b7280",
 };
 
@@ -49,12 +49,12 @@ export default function PrestamosTiempoChart({ data }) {
           legendPosition: "middle",
         }}
         pointSize={6}
-        pointBorderWidth={52}
+        pointBorderWidth={2}
         useMesh={true}
         enableArea={true}
         curve="monotoneX"
         theme={{
-          textColor: "#0f172a",
+          textColor: "#182b43",
           axis: {
             ticks: {
               text: { fontSize: 11 },
@@ -68,7 +68,7 @@ export default function PrestamosTiempoChart({ data }) {
           },
         }}
         // 👇 aquí usas tu paleta
-        colors={({ id }) => colorPorTipo[id] || "#3b82f6"}
+        colors={({ id }) => colorPorTipo[id] || "#176d78"}
         legends={[
           {
             anchor: "top",

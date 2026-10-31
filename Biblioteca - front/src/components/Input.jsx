@@ -13,25 +13,29 @@ const Input = forwardRef(function Input(
     as = "input",
     className = "",
     size = "md",
-    numeric = false,       // 👈 NUEVO PROP
+    numeric = false, // 👈 NUEVO PROP
     maxLength,
     onChange,
     onKeyDown,
     ...rest
   },
-  ref
+  ref,
 ) {
   const Comp = as;
   const sizeCls = sizeMap[size] ?? "";
 
   const handleKeyDown = (e) => {
     if (numeric) {
+      if (e.ctrlKey || e.metaKey) return onKeyDown?.(e);
       const allowedKeys = [
         "Backspace",
         "Tab",
         "ArrowLeft",
         "ArrowRight",
         "Delete",
+        "Enter",
+        "Home",
+        "End",
       ];
 
       if (allowedKeys.includes(e.key)) {

@@ -15,7 +15,7 @@ export default function useSancion() {
   const [success, setSuccess] = useState(false);
 
   const levantarSancion = useCallback(
-    async (dni, lectorId) => {
+    async (dni, _lectorId) => {
       setLoading(true);
       setError(null);
       setSuccess(false);
@@ -28,8 +28,8 @@ export default function useSancion() {
         const resp = await dispatch(
           authFetch(
             `${urlBack + apiSancion}/levantar?dni=${encodeURIComponent(dni)}`,
-            { method: "POST" }
-          )
+            { method: "POST" },
+          ),
         );
 
         if (resp.status === 401) {
@@ -50,7 +50,6 @@ export default function useSancion() {
         setSuccess(true);
 
         await dispatch(getLector());
-
       } catch (e) {
         console.error(e);
         setError(e.message || "Error al levantar la sanción");
@@ -58,7 +57,7 @@ export default function useSancion() {
         setLoading(false);
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   const resetEstado = useCallback(() => {

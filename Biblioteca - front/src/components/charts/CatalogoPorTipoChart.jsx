@@ -2,9 +2,9 @@
 import { ResponsivePie } from "@nivo/pie";
 
 const colorPorTipo = {
-  LIBRO: "#f97316",
-  ARTICULO: "#018f35ff",
-  TESIS: "#415d8aff", 
+  LIBRO: "#176d78",
+  ARTICULO: "#54759a",
+  TESIS: "#8c815f",
   SIN_TIPO: "#6b7280",
 };
 
@@ -32,9 +32,9 @@ export default function CatalogoPorTipoChart({ data }) {
         borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
         arcLabelsSkipAngle={12}
         arcLabelsTextColor="#f5f5f5ff"
-        enableArcLinkLabels={false} 
+        enableArcLinkLabels={false}
         theme={{
-          textColor: "#0f172a",
+          textColor: "#182b43",
           tooltip: { container: { background: "white", fontSize: 13 } },
         }}
         legends={[
@@ -46,7 +46,7 @@ export default function CatalogoPorTipoChart({ data }) {
             itemWidth: 90,
             itemHeight: 18,
             translateY: 40,
-            itemTextColor: "#64748b",
+            itemTextColor: "#71859b",
             symbolSize: 12,
             symbolShape: "circle",
           },

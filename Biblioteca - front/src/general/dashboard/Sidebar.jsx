@@ -1,48 +1,44 @@
-// src/dashboard/Sidebar.jsx
-import React, { useMemo } from "react";
-import "./Sidebar.css";
 import { NavLink } from "react-router-dom";
-import { SECTIONS, filterSectionsByRole } from "../../utils/navConfig";
 import { useSelector } from "react-redux";
+import { SECTIONS, filterSectionsByRole } from "@/utils/navConfig";
 
-export default function Sidebar({ drawerId = "app-drawer" }) {
-  const role = useSelector(s => s.auth?.role); // "BIBLIOTECARIO", "LECTOR", "ADMIN", etc.
-
-  const sections = useMemo(
-    () => filterSectionsByRole(SECTIONS, role),
-    [role]
+// The existing role configuration is shared by desktop and mobile navigation.
+export default function Sidebar({
+  isOpen = false,
+  onNavigate,
+  reader = false,
+}) {
+  const role = useSelector((state) => state.auth?.role);
+  const items = filterSectionsByRole(SECTIONS, role).flatMap(
+    (section) => section.items,
   );
-
   return (
-    <div className="drawer-side">
-      <div className="drawer-overlay lg:hidden pointer-events-none" />
-      <aside className="sidebar h-screen lg:h-screen sticky lg:top-0 overflow-y-auto">
-        <div className="sidebar__header">
-          <div className="sidebar__panelHint">Panel</div>
-          <div className="sidebar__brand">BIBLIOTECA</div>
-        </div>
-
-        <ul className="sidebar__menu">
-          {sections.map((sec) => (
-            <li key={sec.label} className="sidebar__section">
-              <span className="sidebar__sectionLabel">{sec.label}</span>
-
-              {sec.items.map(({ to, label, Icon }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  className={({ isActive }) =>
-                    `sidebar__item ${isActive ? "sidebar__item--active" : ""}`
-                  }
-                >
-                  {Icon && <Icon />}
-                  <span>{label}</span>
-                </NavLink>
-              ))}
-            </li>
-          ))}
-        </ul>
-      </aside>
-    </div>
+    <nav
+      id="workspace-navigation"
+      className={`workspace-navigation${isOpen ? " is-open" : ""}${reader ? " workspace-navigation--reader" : ""}`}
+      aria-label={reader ? "Menú del lector" : "Navegación de gestión"}
+    >
+      <div className="workspace-navigation__inner">
+        {items.map(({ to, label, Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              `workspace-link${isActive ? " is-active" : ""}`
+            }
+          >
+            <Icon size={18} strokeWidth={1.7} aria-hidden="true" />
+            <span>
+              {role === "LECTOR" && to.endsWith("catalogo")
+                ? "Catálogo"
+                : to.endsWith("perfil")
+                  ? "Mi perfil"
+                  : label}
+            </span>
+          </NavLink>
+        ))}
+      </div>
+    </nav>
   );
 }

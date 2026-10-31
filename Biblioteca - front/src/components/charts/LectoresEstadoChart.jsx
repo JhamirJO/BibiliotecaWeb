@@ -1,9 +1,9 @@
 // src/components/charts/LectoresEstadoChart.jsx
 import { ResponsivePie } from "@nivo/pie";
 
-const lectorEstado= {
-  INACTIVO:  "#ffc916ff",
-  ACTIVO: "#018f35ff",
+const lectorEstado = {
+  INACTIVO: "#d1b478",
+  ACTIVO: "#54759a",
 };
 export default function LectoresEstadoChart({ data }) {
   console.log("[LectoresEstadoChart] props.data:", data);
@@ -30,9 +30,9 @@ export default function LectoresEstadoChart({ data }) {
         borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
         arcLabelsSkipAngle={12}
         arcLabelsTextColor="#000000ff"
-        enableArcLinkLabels={false} 
+        enableArcLinkLabels={false}
         theme={{
-          textColor: "#0f172a",
+          textColor: "#182b43",
           tooltip: { container: { background: "white", fontSize: 12 } },
         }}
         legends={[
@@ -44,7 +44,7 @@ export default function LectoresEstadoChart({ data }) {
             itemsSpacing: 8,
             itemWidth: 90,
             itemHeight: 18,
-            itemTextColor: "#64748b",
+            itemTextColor: "#71859b",
             symbolSize: 12,
             symbolShape: "circle",
           },

@@ -2,9 +2,9 @@
 import { ResponsiveBar } from "@nivo/bar";
 
 const colorPorTipo = {
-  LIBRO: "#f97316",
-  ARTICULO: "#018f35ff",
-  TESIS: "#415d8aff", 
+  LIBRO: "#176d78",
+  ARTICULO: "#54759a",
+  TESIS: "#8c815f",
   SIN_TIPO: "#6b7280",
 };
 
@@ -29,7 +29,7 @@ export default function PrestamosPorTipoChart({ data }) {
         padding={0.3}
         valueScale={{ type: "linear" }}
         indexScale={{ type: "band", round: true }}
-        colors={({ data }) => colorPorTipo[data.tipo] || "#3b82f6"}
+        colors={({ data }) => colorPorTipo[data.tipo] || "#176d78"}
         borderRadius={3}
         borderWidth={1}
         borderColor={{ from: "color", modifiers: [["darker", 0.4]] }}
@@ -40,7 +40,6 @@ export default function PrestamosPorTipoChart({ data }) {
           legend: "Tipo de publicación",
           legendPosition: "middle",
           legendOffset: 50,
-          
         }}
         axisLeft={{
           tickSize: 5,
@@ -54,7 +53,7 @@ export default function PrestamosPorTipoChart({ data }) {
         labelSkipHeight={16}
         labelTextColor="#f5f5f5ff"
         theme={{
-          textColor: "#0f172a",
+          textColor: "#182b43",
           axis: {
             ticks: {
               text: { fontSize: 11 },

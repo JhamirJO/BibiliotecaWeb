@@ -1,10 +1,9 @@
-import React, { forwardRef } from "react";
-import { LimpiarFiltro } from "@/utils/Icons";
-import Input from "@/components/Input"
+import { forwardRef } from "react";
+import { Search, X } from "lucide-react";
 
 const Filter = forwardRef(function Filter(
   {
-    value,
+    value = "",
     onChange,
     onClear,
     placeholder = "Buscar",
@@ -12,41 +11,39 @@ const Filter = forwardRef(function Filter(
     name,
     id,
   },
-  ref
+  ref,
 ) {
-  const handleClear = () => {
-    if (onClear) onClear();
-    if (onChange) onChange("");
+  const clear = () => {
+    onClear?.();
+    onChange?.("");
   };
-
   return (
-    <div className={`relative ${className}`}>
-      <Input
+    <div className={`search-field ${className}`}>
+      <Search size={17} strokeWidth={1.7} aria-hidden="true" />
+      <input
         ref={ref}
         id={id}
         name={name}
+        type="search"
+        aria-label={placeholder}
         placeholder={placeholder}
         value={value}
-        onChange={(e) => onChange?.(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Escape") handleClear();
+        onChange={(event) => onChange?.(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") clear();
         }}
       />
-
-      {/* X derecha */}
       {!!value && (
         <button
           type="button"
-          onClick={handleClear}
-          className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+          onClick={clear}
           aria-label="Limpiar búsqueda"
-          title="Limpiar"
+          title="Limpiar búsqueda"
         >
-          <LimpiarFiltro />
+          <X size={16} />
         </button>
       )}
     </div>
   );
 });
-
 export default Filter;

@@ -1,6 +1,6 @@
+import PageHeader from "@/components/layout/PageHeader";
 // src/general/page/reporte/Reporte.jsx
 import Card from "../../../components/Card";
-import { ReporteIcon } from "@/utils/Icons";
 import PrestamosTiempoChart from "../../../components/charts/PrestamosTiempoChart";
 import EstadoPrestamosChart from "../../../components/charts/EstadoPrestamosChart";
 import PrestamosPorTipoChart from "../../../components/charts/PrestamosPorTipoChart";
@@ -25,29 +25,19 @@ export default function Reporte() {
     dataStockVsUso,
   } = useReporteData();
 
-  const kpiDevueltoTarde = Number(
-    porcentajeDevueltoTarde?.toFixed(1) || 0
-  );
+  const kpiDevueltoTarde = Number(porcentajeDevueltoTarde?.toFixed(1) || 0);
 
   return (
-    <div className="mx-auto w-full max-w-9xl px-4 sm:px-6 lg:px-8 space-y-4">
+    <div className="feature-page space-y-5">
       {/* Header */}
-      <Card className="flex items-start gap-4">
-        <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center">
-          <ReporteIcon />
-        </div>
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-slate-900">
-            Sección de Reporte
-          </h2>
-          <p className="mt-1 text-slate-600">
-            Administra y visualiza el comportamiento de los préstamos en el tiempo.
-          </p>
-        </div>
-      </Card>
+      <PageHeader
+        title="Reportes"
+        description="Consulta el comportamiento de los préstamos y la composición del catálogo."
+        section="Analítica"
+      />
 
       {/* Grid único de tarjetas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="reports-grid">
         {/* 1. Evolución de préstamos (ancho en xl) */}
         <Card className="xl:col-span-1">
           <div className="h-full flex flex-col">

@@ -1,10 +1,8 @@
 // src/general/pages/Login/LoginForm.jsx
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import logo from "@/img/logobanner.png";
-import "@/general/pages/Login/Login.css";
-import Input from "@/components/Input";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { loginThunk } from "@/actions/authThunks";
 import { clearError } from "@/slices/authSlice";
 import { getDefaultDashboardPath } from "@/utils/navConfig"; // <-- usa tu helper
@@ -51,38 +49,72 @@ const LoginForm = () => {
   }, [status, role, from, navigate, location.pathname]);
 
   const isLoading = status === "authenticating";
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="bg-gray-100 flex flex-col w-full flex-grow items-center">
-      <img src={logo} alt="Logo" className="w-40 my-4 md:w-52" />
-      <div className="flex flex-col items-center justify-center flex-grow mb-16">
-        <h1 className="text-3xl font-bold text-center text-slate-800 mb-10">
-          PORTAL DE GESTIÓN BIBLIOTECARIO
-        </h1>
-
+    <div className="login-box">
+      <span className="eyebrow">Acceso al portal</span>
+      <h1>
+        Tu biblioteca,
+        <br />
+        más cerca.
+      </h1>
+      <p>
+        Ingresa con el usuario y la contraseña proporcionados por la biblioteca.
+      </p>
+      <form onSubmit={onSubmit}>
         {error && (
-          <div className="alert alert-error w-72 sm:w-80 md:w-96 lg:w-[20rem] mb-2 text-sm">
+          <div className="alert alert-error" role="alert">
             {error}
           </div>
         )}
-
-        <form onSubmit={onSubmit} className="flex flex-col space-y-4 text-sm w-72 sm:w-80 md:w-96 lg:w-[20rem]">
-          <Input
-            id="username" name="username" type="text" placeholder="Usuario"
-            className="input input-bordered w-full" autoComplete="username"
-            required value={form.username} onChange={onChange}
+        <div>
+          <label htmlFor="username">Usuario</label>
+          <input
+            id="username"
+            name="username"
+            autoComplete="username"
+            required
+            value={form.username}
+            onChange={onChange}
+            placeholder="Ingresa tu usuario"
+            disabled={isLoading}
           />
-          <Input
-            id="password" name="password" type="password" placeholder="Contraseña"
-            className="input input-bordered w-full" autoComplete="current-password"
-            required value={form.password} onChange={onChange}
-          />
-
-          <button type="submit" className="btn bg-slate-700 text-white w-full hover:bg-slate-600" disabled={isLoading}>
-            {isLoading ? "Ingresando..." : "Iniciar sesión"}
-          </button>
-        </form>
-      </div>
+        </div>
+        <div>
+          <label htmlFor="password">Contraseña</label>
+          <div className="password-control">
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              required
+              value={form.password}
+              onChange={onChange}
+              placeholder="Ingresa tu contraseña"
+              disabled={isLoading}
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              aria-label={
+                showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+              }
+              aria-pressed={showPassword}
+              onClick={() => setShowPassword((show) => !show)}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </div>
+        <button type="submit" className="btn btn-primary" disabled={isLoading}>
+          {isLoading ? "Ingresando…" : "Iniciar sesión"}
+        </button>
+      </form>
+      <p className="login-footer">
+        ¿Necesitas ayuda con tu cuenta? Comunícate con la biblioteca.
+      </p>
     </div>
   );
 };

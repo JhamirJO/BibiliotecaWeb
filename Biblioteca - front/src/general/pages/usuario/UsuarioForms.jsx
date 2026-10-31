@@ -7,11 +7,11 @@ export default function UsuarioForms({
   onClose,
   creating = false,
   error,
-  tipo = "Lector",        // "Lector" | "Bibliotecario"
-  initialValues,          // para modo edición
-  onCreated,              // (payload, { mode }) => Promise / void
-  returnFocusRef,         // opcional, para devolver el foco
-  mode = "create",        // "create" | "edit"
+  tipo = "Lector", // "Lector" | "Bibliotecario"
+  initialValues, // para modo edición
+  onCreated, // (payload, { mode }) => Promise / void
+  returnFocusRef, // opcional, para devolver el foco
+  mode = "create", // "create" | "edit"
 }) {
   const dialogRef = useRef(null);
   const boxRef = useRef(null);
@@ -41,7 +41,7 @@ export default function UsuarioForms({
         // aquí podrías agregar campos específicos de bibliotecario en el futuro
       },
     }),
-    []
+    [],
   );
 
   const [form, setForm] = useState(EMPTY);
@@ -161,16 +161,19 @@ export default function UsuarioForms({
     // USER
     user_username: (c) => (
       <div>
-        <label className="label text-slate-700">
+        <label htmlFor="user-field-1" className="label text-slate-700">
           <span className="label-text font-medium">
             Usuario<span className="text-error">*</span>
           </span>
         </label>
         <Input
+          id="user-field-1"
           type="text"
           placeholder="Ej: Lector3"
           value={c.form.usuario.username}
-          onChange={(e) => c.handleChange("usuario", "username", e.target.value)}
+          onChange={(e) =>
+            c.handleChange("usuario", "username", e.target.value)
+          }
           required
           disabled={c.creating}
         />
@@ -178,12 +181,13 @@ export default function UsuarioForms({
     ),
     user_email: (c) => (
       <div>
-        <label className="label text-slate-700">
+        <label htmlFor="user-field-2" className="label text-slate-700">
           <span className="label-text font-medium">
             Correo electrónico<span className="text-error">*</span>
           </span>
         </label>
         <Input
+          id="user-field-2"
           type="email"
           placeholder="Ej: lector3@demo.com"
           value={c.form.usuario.email}
@@ -195,20 +199,21 @@ export default function UsuarioForms({
     ),
     user_password: (c) => (
       <div>
-        <label className="label text-slate-700">
+        <label htmlFor="user-field-3" className="label text-slate-700">
           <span className="label-text font-medium">
             Contraseña
             {!c.isEdit && <span className="text-error">*</span>}
           </span>
         </label>
         <Input
+          id="user-field-3"
           type="password"
           placeholder={c.isEdit ? "Contraseña" : "********"}
           value={c.form.usuario.password_hash}
           onChange={(e) =>
             c.handleChange("usuario", "password_hash", e.target.value)
           }
-          required={!c.isEdit}  // solo obligatoria al crear
+          required={!c.isEdit} // solo obligatoria al crear
           disabled={c.creating}
         />
       </div>
@@ -217,12 +222,13 @@ export default function UsuarioForms({
     // PERSONA
     persona_dni: (c) => (
       <div>
-        <label className="label text-slate-700">
+        <label htmlFor="user-field-4" className="label text-slate-700">
           <span className="label-text font-medium">
             DNI<span className="text-error">*</span>
           </span>
         </label>
         <Input
+          id="user-field-4"
           type="text"
           placeholder="Ej: 87732925"
           inputMode="numeric"
@@ -237,12 +243,13 @@ export default function UsuarioForms({
     ),
     persona_nombre: (c) => (
       <div>
-        <label className="label text-slate-700">
+        <label htmlFor="user-field-5" className="label text-slate-700">
           <span className="label-text font-medium">
             Nombre<span className="text-error">*</span>
           </span>
         </label>
         <Input
+          id="user-field-5"
           type="text"
           placeholder="Ej: Juan"
           value={c.form.persona.nombre}
@@ -254,12 +261,13 @@ export default function UsuarioForms({
     ),
     persona_apellido: (c) => (
       <div>
-        <label className="label text-slate-700">
+        <label htmlFor="user-field-6" className="label text-slate-700">
           <span className="label-text font-medium">
             Apellidos<span className="text-error">*</span>
           </span>
         </label>
         <Input
+          id="user-field-6"
           type="text"
           placeholder="Ej: Pérez"
           value={c.form.persona.apellido}
@@ -273,12 +281,13 @@ export default function UsuarioForms({
     ),
     persona_telefono: (c) => (
       <div>
-        <label className="label text-slate-700">
+        <label htmlFor="user-field-7" className="label text-slate-700">
           <span className="label-text font-medium">
             Teléfono<span className="text-error">*</span>
           </span>
         </label>
         <Input
+          id="user-field-7"
           type="text"
           inputMode="numeric"
           numeric
@@ -297,12 +306,13 @@ export default function UsuarioForms({
     // LECTOR (solo cuando tipo === "Lector")
     lector_direccion: (c) => (
       <div className="md:col-span-2">
-        <label className="label text-slate-700">
+        <label htmlFor="user-field-8" className="label text-slate-700">
           <span className="label-text font-medium">
             Dirección<span className="text-error">*</span>
           </span>
         </label>
         <Input
+          id="user-field-8"
           type="text"
           placeholder="Ej: Av. San José 754"
           value={c.form.lector.direccion}
@@ -335,10 +345,10 @@ export default function UsuarioForms({
     Lector: [{ key: "lector_direccion", order: 80, span: 1 }],
   };
 
-  const activeSpecs = useMemo(() => {
+  const activeSpecs = (() => {
     const extras = EXTRA_BY_TIPO[tipo] || [];
     return [...BASE_FIELDS, ...extras].sort((a, b) => a.order - b.order);
-  }, [tipo]);
+  })();
 
   const ctx = {
     tipo,
@@ -356,8 +366,8 @@ export default function UsuarioForms({
       ? "Editar Bibliotecario"
       : "Editar Lector"
     : tipo === "Bibliotecario"
-    ? "Nuevo Bibliotecario"
-    : "Nuevo Lector";
+      ? "Nuevo Bibliotecario"
+      : "Nuevo Lector";
 
   return (
     <dialog
@@ -398,8 +408,8 @@ export default function UsuarioForms({
                   span === 2
                     ? "md:col-span-2"
                     : span === 3
-                    ? "md:col-span-3"
-                    : "";
+                      ? "md:col-span-3"
+                      : "";
                 return (
                   <div key={key} className={spanClass}>
                     {Fields[key](ctx)}
@@ -429,8 +439,8 @@ export default function UsuarioForms({
                   ? "Guardando..."
                   : "Creando..."
                 : isEdit
-                ? "Guardar cambios"
-                : "Crear"}
+                  ? "Guardar cambios"
+                  : "Crear"}
             </button>
           </div>
         </form>
@@ -438,11 +448,7 @@ export default function UsuarioForms({
 
       {/* Backdrop */}
       <form method="dialog" className="modal-backdrop">
-        <button
-          aria-label="Cerrar"
-          onClick={handleCancel}
-          disabled={creating}
-        >
+        <button aria-label="Cerrar" onClick={handleCancel} disabled={creating}>
           close
         </button>
       </form>

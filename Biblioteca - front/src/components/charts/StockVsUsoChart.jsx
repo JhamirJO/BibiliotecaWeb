@@ -2,10 +2,9 @@
 import { ResponsiveBar } from "@nivo/bar";
 
 const colorStockPrestamo = {
-  stock:  "#415d8aff",
-  prestamos: "#018f35ff",
+  stock: "#8c815f",
+  prestamos: "#54759a",
 };
-
 
 export default function StockVsUsoChart({ data }) {
   const ok = Array.isArray(data) && data.length > 0;
@@ -47,7 +46,7 @@ export default function StockVsUsoChart({ data }) {
         labelSkipHeight={16}
         labelTextColor="#f5f5f5ff"
         theme={{
-          textColor: "#0f172a",
+          textColor: "#182b43",
           tooltip: { container: { background: "white", fontSize: 12 } },
         }}
         legends={[
@@ -58,7 +57,7 @@ export default function StockVsUsoChart({ data }) {
             itemsSpacing: 8,
             itemWidth: 80,
             itemHeight: 18,
-            itemTextColor: "#64748b",
+            itemTextColor: "#71859b",
             symbolSize: 12,
             symbolShape: "circle",
           },

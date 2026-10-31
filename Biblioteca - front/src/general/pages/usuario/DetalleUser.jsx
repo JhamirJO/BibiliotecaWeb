@@ -1,7 +1,9 @@
 // src/components/DetalleUser.jsx
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useRef } from "react";
 
 /* Chips generales (por si los quieres usar luego) */
+const EMPTY_RECORD = Object.freeze({});
+
 const Badge = ({ children }) => (
   <span className="inline-flex items-center rounded-full bg-slate-200/80 px-2.5 py-0.5 text-xs font-medium text-slate-700">
     {children}
@@ -48,19 +50,17 @@ export default function DetalleUser({
   loading,
   error,
 }) {
-  if (!open) return null;
-
-  const user = detalle?.user ?? detalle?.usuario ?? {};
-  const persona = detalle?.persona ?? {};
-  const lector = detalle?.lector ?? {};
-  const biblio = detalle?.biblio ?? {};
+  const user = detalle?.user ?? detalle?.usuario ?? EMPTY_RECORD;
+  const persona = detalle?.persona ?? EMPTY_RECORD;
+  const lector = detalle?.lector ?? EMPTY_RECORD;
+  const biblio = detalle?.biblio ?? EMPTY_RECORD;
 
   const fullName =
     `${persona.nombre ?? ""} ${persona.apellido ?? ""}`.trim() || "Sin nombre";
 
   const initials = useMemo(
     () => getInitials(persona.nombre, persona.apellido),
-    [persona.nombre, persona.apellido]
+    [persona.nombre, persona.apellido],
   );
 
   const secciones = useMemo(() => {
@@ -131,14 +131,38 @@ export default function DetalleUser({
       .map((sec) => ({
         ...sec,
         items: sec.items.filter(
-          (i) => hasValue(i.value) && !labelsLadoIzq.includes(i.label)
+          (i) => hasValue(i.value) && !labelsLadoIzq.includes(i.label),
         ),
       }))
       .filter((sec) => sec.items.length > 0);
   }, [persona, user, lector, biblio, tipo]);
 
+  const dialogRef = useRef(null);
+  useEffect(() => {
+    if (!open || !dialogRef.current) return;
+    const previous = document.activeElement;
+    const dialog = dialogRef.current;
+    if (!dialog.open) dialog.showModal();
+    return () => {
+      if (dialog.open) dialog.close();
+      previous?.focus?.();
+    };
+  }, [open]);
+  if (!open) return null;
+
   return (
-    <dialog open className="modal">
+    <dialog
+      ref={dialogRef}
+      className="modal"
+      aria-label="Detalle de usuario"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
       <div className="modal-box max-w-4xl p-0 overflow-hidden h-[90vh] max-h-[90vh] rounded-2xl">
         <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] h-full min-h-0">
           {/* Panel izquierdo */}

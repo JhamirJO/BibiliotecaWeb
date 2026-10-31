@@ -1,10 +1,22 @@
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 import React, { useMemo, useState } from "react";
-import { PencilIcon, TrashIcon, ViewIcon, ArchiveIcon  } from "../utils/Icons";
+import { PencilIcon, TrashIcon, ViewIcon, ArchiveIcon } from "../utils/Icons";
 import { useCurrentRole } from "@/general/hooks/useCurrentRole";
 
-function cx(...classes) { return classes.filter(Boolean).join(" "); }
+function cx(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 const normalizeRole = (r = "") =>
-  r.toString().trim().toUpperCase().replace(/^ROLE_/, "");
+  r
+    .toString()
+    .trim()
+    .toUpperCase()
+    .replace(/^ROLE_/, "");
 
 export default function GenericTable({
   columns = [],
@@ -42,7 +54,7 @@ export default function GenericTable({
   const pageSize = controlledPageSize ?? uncontrolledPageSize;
 
   const total =
-    paginationMode === "server" ? totalRows ?? data.length : data.length;
+    paginationMode === "server" ? (totalRows ?? data.length) : data.length;
 
   const pagedData = useMemo(() => {
     if (paginationMode === "server") return data;
@@ -58,7 +70,7 @@ export default function GenericTable({
       : Math.min(
           page * pageSize +
             (paginationMode === "server" ? data.length : pageSize),
-          total
+          total,
         );
 
   const goToPage = (next) => {
@@ -88,12 +100,17 @@ export default function GenericTable({
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-slate-300 shadow-sm">
-        <div className="overflow-x-auto">
+      <div className="table-shell">
+        <div
+          className="table-scroll"
+          tabIndex={0}
+          role="region"
+          aria-label="Tabla de registros"
+        >
           <table
             className={cx(
-              "table w-full table-fixed text-base",
-              dense ? "table-xs" : "table-sm"
+              "table w-full text-base",
+              dense ? "table-xs" : "table-sm",
             )}
           >
             <thead className="bg-slate-200/70 text-base-content/70 text-slate-800">
@@ -103,8 +120,8 @@ export default function GenericTable({
                     key={col.id}
                     className={cx(
                       "break-words whitespace-nowrap text-center", // 👈 siempre centrado
-                      col.width,                                   // respeta el width
-                      col.headerClass
+                      col.width, // respeta el width
+                      col.headerClass,
                     )}
                   >
                     <div className="inline-flex items-center gap-1">
@@ -141,18 +158,18 @@ export default function GenericTable({
                         className={cx(
                           col.align === "right" && "text-right",
                           col.align === "center" && "text-center",
-                          col.width,        // 👈 mismo ancho que header
-                          col.cellClass     // opcional para estilos extra
+                          col.width, // 👈 mismo ancho que header
+                          col.cellClass, // opcional para estilos extra
                         )}
                       >
                         {col.cell
                           ? col.cell(row)
                           : col.accessor
-                          ? (row[col.accessor] ??
-                            row[col.accessor] === 0
-                            ? String(row[col.accessor])
-                            : "—")
-                          : null}
+                            ? row[col.accessor] !== null &&
+                              row[col.accessor] !== undefined
+                              ? String(row[col.accessor])
+                              : "—"
+                            : null}
                       </td>
                     ))}
 
@@ -179,7 +196,9 @@ export default function GenericTable({
                               aria-label="Editar"
                               type="button"
                               onClick={() =>
-                                onEdit ? onEdit(id) : console.log("Edit ID ->", id)
+                                onEdit
+                                  ? onEdit(id)
+                                  : console.log("Edit ID ->", id)
                               }
                             >
                               <PencilIcon className="h-5 w-5" />
@@ -208,7 +227,7 @@ export default function GenericTable({
                               type="button"
                               onClick={() =>
                                 onDelete
-                                  ? onDelete(row,id)
+                                  ? onDelete(row, id)
                                   : console.log("Delete ID ->", row, id)
                               }
                             >
@@ -218,7 +237,6 @@ export default function GenericTable({
                         </div>
                       </td>
                     )}
-
                   </tr>
                 );
               })}
@@ -227,7 +245,7 @@ export default function GenericTable({
         </div>
 
         {/* Footer paginación igual que lo tenías */}
-        <div className="flex items-center justify-between gap-4 border-t border-base-200 bg-base-100 px-4 py-2 text-sm">
+        <div className="table-pagination">
           <div className="flex items-center gap-2 whitespace-nowrap">
             <span className="text-base-content/70">Filas por página:</span>
             <select
@@ -250,35 +268,35 @@ export default function GenericTable({
           <div className="join hidden sm:inline-flex">
             <button
               className="btn btn-ghost btn-xs join-item"
-              aria-label="Primera"
               onClick={() => goToPage(0)}
+              aria-label="Primera página"
               disabled={page <= 0}
             >
-              «
+              <ChevronsLeft size={16} aria-hidden="true" />
             </button>
             <button
               className="btn btn-ghost btn-xs join-item"
-              aria-label="Anterior"
               onClick={() => goToPage(page - 1)}
+              aria-label="Página anterior"
               disabled={page <= 0}
             >
-              ‹
+              <ChevronLeft size={16} aria-hidden="true" />
             </button>
             <button
               className="btn btn-ghost btn-xs join-item"
-              aria-label="Siguiente"
               onClick={() => goToPage(page + 1)}
+              aria-label="Página siguiente"
               disabled={page >= maxPage}
             >
-              ›
+              <ChevronRight size={16} aria-hidden="true" />
             </button>
             <button
               className="btn btn-ghost btn-xs join-item"
-              aria-label="Última"
               onClick={() => goToPage(maxPage)}
+              aria-label="Última página"
               disabled={page >= maxPage}
             >
-              »
+              <ChevronsRight size={16} aria-hidden="true" />
             </button>
           </div>
         </div>

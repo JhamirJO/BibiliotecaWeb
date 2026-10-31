@@ -1,3 +1,4 @@
+import PageHeader from "@/components/layout/PageHeader";
 // src/general/pages/prestamo/PrestamoHistorial.jsx
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,7 +7,6 @@ import Card from "@/components/Card";
 import { getLectorPerfil } from "@/actions/lectorThunks";
 import { getPrestamoByDni } from "@/actions/prestamoThunks";
 import GenericTable from "@/components/GenericTable";
-import { GestorPub } from "@/utils/Icons";
 import EstadoPill from "@/components/EstadoPill";
 
 export default function PrestamoHistorial() {
@@ -39,8 +39,7 @@ export default function PrestamoHistorial() {
   useEffect(() => {
     if (!perfil) return;
 
-    const dni =
-      perfil.persona?.dni || perfil.dni_p || perfil.dni;
+    const dni = perfil.persona?.dni || perfil.dni_p || perfil.dni;
 
     if (dni) {
       dispatch(getPrestamoByDni(dni));
@@ -51,11 +50,41 @@ export default function PrestamoHistorial() {
 
   // 📋 Columnas
   const columns = [
-    { id: "id_p",      header: "Id Préstamo",      accessor: "id_p",      width: "w-28", align: "center" },
-    { id: "titulo",    header: "Título",           accessor: "titulo",    width: "w-72", align: "left"   },
-    { id: "fecha_p",   header: "Fecha Préstamo",   accessor: "fecha_p",   width: "w-32", align: "center" },
-    { id: "fecha_max", header: "Fecha Máx.",       accessor: "fecha_max", width: "w-32", align: "center" },
-    { id: "fecha_e",   header: "Fecha Devolución", accessor: "fecha_e",   width: "w-36", align: "center" },
+    {
+      id: "id_p",
+      header: "Id Préstamo",
+      accessor: "id_p",
+      width: "w-28",
+      align: "center",
+    },
+    {
+      id: "titulo",
+      header: "Título",
+      accessor: "titulo",
+      width: "w-72",
+      align: "left",
+    },
+    {
+      id: "fecha_p",
+      header: "Fecha Préstamo",
+      accessor: "fecha_p",
+      width: "w-32",
+      align: "center",
+    },
+    {
+      id: "fecha_max",
+      header: "Fecha Máx.",
+      accessor: "fecha_max",
+      width: "w-32",
+      align: "center",
+    },
+    {
+      id: "fecha_e",
+      header: "Fecha Devolución",
+      accessor: "fecha_e",
+      width: "w-36",
+      align: "center",
+    },
     {
       id: "estado",
       header: "Estado",
@@ -66,39 +95,29 @@ export default function PrestamoHistorial() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-9xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-4">
+    <div className="feature-page space-y-5">
       {/* 🔹 Card de presentación encima de la tabla */}
-      <Card className="flex items-start gap-4">
-        <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center">
-          <GestorPub />
-        </div>
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-slate-900">
-            Historial de Préstamos
-          </h2>
-          <p className="mt-1 text-slate-600">
-            Consulta tus préstamos realizados.
-          </p>
-
-          {estaCargandoLector && (
-            <p className="mt-1 text-xs text-slate-400">Cargando perfil…</p>
-          )}
-          {errorLector && (
-            <p className="mt-1 text-xs text-red-500">
-              Error al cargar perfil del lector
-            </p>
-          )}
-          {estaCargandoMisPrestamos && (
-            <p className="mt-1 text-xs text-slate-400">Cargando préstamos…</p>
-          )}
-          {errorMisPrestamos && (
-            <p className="mt-1 text-xs text-red-500">
-              Error al cargar historial de préstamos
-            </p>
-          )}
-        </div>
-      </Card>
-
+      <PageHeader
+        title="Mis préstamos"
+        description="Consulta las fechas y el estado de las publicaciones que has solicitado."
+        section="Tu actividad en la biblioteca"
+      />{" "}
+      {estaCargandoLector && (
+        <p className="mt-1 text-xs text-slate-400">Cargando perfil…</p>
+      )}
+      {errorLector && (
+        <p className="mt-1 text-xs text-red-500">
+          Error al cargar perfil del lector
+        </p>
+      )}
+      {estaCargandoMisPrestamos && (
+        <p className="mt-1 text-xs text-slate-400">Cargando préstamos…</p>
+      )}
+      {errorMisPrestamos && (
+        <p className="mt-1 text-xs text-red-500">
+          Error al cargar historial de préstamos
+        </p>
+      )}
       {/* 🔹 Tabla de historial */}
       <Card>
         <GenericTable

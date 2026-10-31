@@ -5,17 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import Card from "@/components/Card";
 import Input from "@/components/Input";
 
-import {
-  getLectorPerfil,
-} from "@/actions/lectorThunks";
+import { getLectorPerfil } from "@/actions/lectorThunks";
 
-import {
-  getBibliotecarioPerfil,
-} from "@/actions/bibliotecarioThunks";
+import { getBibliotecarioPerfil } from "@/actions/bibliotecarioThunks";
 
-import {
-  cambiarPasswordUsuario,
-} from "@/actions/userThunks";
+import { cambiarPasswordUsuario } from "@/actions/UserThunks";
 
 export default function CambiarContraseña() {
   const dispatch = useDispatch();
@@ -57,7 +51,9 @@ export default function CambiarContraseña() {
   // ⚠️ AHORA tomamos el id_u desde usuario, NO el cod_l / cod_b
   const usuarioId = usuario?.id_u;
 
-  const isLoadingPerfil = isLector ? estaCargandoLector : estaCargandoBibliotecario;
+  const isLoadingPerfil = isLector
+    ? estaCargandoLector
+    : estaCargandoBibliotecario;
   const errorGlobalPerfil = errorLector || errorBibliotecario;
 
   const [nueva, setNueva] = useState("");
@@ -120,9 +116,7 @@ export default function CambiarContraseña() {
           </p>
 
           {isLoadingPerfil && (
-            <p className="text-sm text-slate-500 mb-4">
-              Cargando tu perfil...
-            </p>
+            <p className="text-sm text-slate-500 mb-4">Cargando tu perfil...</p>
           )}
 
           {errorGlobalPerfil && (
@@ -145,26 +139,34 @@ export default function CambiarContraseña() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label
+                htmlFor="new-password"
+                className="block text-sm font-medium text-slate-700 mb-1"
+              >
                 Contraseña nueva
               </label>
               <Input
                 type="password"
                 value={nueva}
                 onChange={(e) => setNueva(e.target.value)}
+                id="new-password"
                 placeholder="Ingresa tu nueva contraseña"
                 autoComplete="new-password"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label
+                htmlFor="confirm-password"
+                className="block text-sm font-medium text-slate-700 mb-1"
+              >
                 Confirmar contraseña
               </label>
               <Input
                 type="password"
                 value={confirmar}
                 onChange={(e) => setConfirmar(e.target.value)}
+                id="confirm-password"
                 placeholder="Vuelve a escribir la contraseña"
                 autoComplete="new-password"
               />

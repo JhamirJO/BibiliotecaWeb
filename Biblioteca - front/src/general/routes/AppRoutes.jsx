@@ -1,25 +1,34 @@
+import { lazy } from "react";
 // src/general/routes/AppRoutes.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
-import LandingPage from "@/general/pages/LandingPage";
-import LoginPage from "@/general/pages/Login/LoginPage";
+const LandingPage = lazy(() => import("@/general/pages/LandingPage"));
+const LoginPage = lazy(() => import("@/general/pages/Login/LoginPage"));
 import Dashboard from "../dashboard/Dashboard";
-import Usuario from "../pages/usuario/Usuario.jsx";
-import Publicaciones from "../pages/publicaciones/Publicaciones.jsx";
-import Prestamo from "../pages/prestamo/Prestamo.jsx";
-import Devolucion from "../pages/devoluciones/Devolucion.jsx";
-import Reporte from "../pages/reporte/Reporte.jsx";
-import Sancion from "../pages/sanciones/Sancion";
-import Perfil from "../pages/perfil/Perfil.jsx";
-import PublicacionCatalogo  from "../pages/publicaciones/PublicacionCatalogo.jsx";
+const Usuario = lazy(() => import("../pages/usuario/Usuario.jsx"));
+const Publicaciones = lazy(
+  () => import("../pages/publicaciones/Publicaciones.jsx"),
+);
+const Prestamo = lazy(() => import("../pages/prestamo/Prestamo.jsx"));
+const Devolucion = lazy(() => import("../pages/devoluciones/Devolucion.jsx"));
+const Reporte = lazy(() => import("../pages/reporte/Reporte.jsx"));
+const Sancion = lazy(() => import("../pages/sanciones/Sancion"));
+const Perfil = lazy(() => import("../pages/perfil/Perfil.jsx"));
+const PublicacionCatalogo = lazy(
+  () => import("../pages/publicaciones/PublicacionCatalogo.jsx"),
+);
 import ProtectedRoute from "./ProtectedRoute";
 import { useSelector } from "react-redux";
 import { getDefaultDashboardPath } from "@/utils/navConfig";
-import Comprobante from "@/components/Comprobante";
-import PrestamoHistorial from "../pages/prestamo/PrestamoHistorial";
-import CambiarContraseña from "../pages/perfil/CambiarContraseña";
+const Comprobante = lazy(() => import("@/components/Comprobante"));
+const PrestamoHistorial = lazy(
+  () => import("../pages/prestamo/PrestamoHistorial"),
+);
+const CambiarContraseña = lazy(
+  () => import("../pages/perfil/CambiarContraseña"),
+);
 
 function DashboardIndex() {
-  const role = useSelector(s => s.auth?.role);
+  const role = useSelector((s) => s.auth?.role);
   const target = getDefaultDashboardPath(role) || "/dashboard/perfil";
   return <Navigate to={target} replace />;
 }
@@ -41,10 +50,9 @@ export const AppRoutes = () => (
         <Route path="reporte" element={<Reporte />} />
         <Route path="sancion" element={<Sancion />} />
         <Route path="perfil" element={<Perfil />} />
-        <Route path="catalogo" element ={<PublicacionCatalogo />} />
-        <Route path="historial" element ={<PrestamoHistorial/>} />
+        <Route path="catalogo" element={<PublicacionCatalogo />} />
+        <Route path="historial" element={<PrestamoHistorial />} />
         <Route path="cambiar-password" element={<CambiarContraseña />} />
-
       </Route>
     </Route>
 

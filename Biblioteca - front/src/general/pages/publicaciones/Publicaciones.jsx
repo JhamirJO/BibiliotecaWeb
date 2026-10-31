@@ -1,14 +1,38 @@
+import PageHeader from "@/components/layout/PageHeader";
+import { Plus, SearchX } from "lucide-react";
 // src/general/pages/publicaciones/Publicaciones.jsx
-import React, { useEffect, useMemo, useState, useRef, useCallback,} from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
-import { getPublicacion, toggleEstadoPublicacion } from "@/actions/publicaconThunks";
-import { getLibro, createLibro, getLibroById, updateLibro,} from "@/actions/libroThunks";
-import { getArticulo, createArticulo, getArticuloById, updateArticulo,} from "@/actions/articuloThunks";
-import { getTesis, createTesis, getTesisById, updateTesis,} from "@/actions/tesisThunks";
+import {
+  getPublicacion,
+  toggleEstadoPublicacion,
+} from "@/actions/publicaconThunks";
+import {
+  getLibro,
+  createLibro,
+  getLibroById,
+  updateLibro,
+} from "@/actions/libroThunks";
+import {
+  getArticulo,
+  createArticulo,
+  getArticuloById,
+  updateArticulo,
+} from "@/actions/articuloThunks";
+import {
+  getTesis,
+  createTesis,
+  getTesisById,
+  updateTesis,
+} from "@/actions/tesisThunks";
 import Filter from "../../../components/Filter";
-import Card from "@/components/Card";
-import { BtnAgregar, GestorPub, SearchPub } from "@/utils/Icons";
 import { TablePub } from "./tables/TablePub";
 import { TableLib } from "./tables/TableLib";
 import { TableArti } from "./tables/TableArti";
@@ -16,14 +40,13 @@ import { TableTesis } from "./tables/TableTesis";
 import PublicacionForm from "./PublicacionForm";
 import DetallesPub from "./DetallesPub"; // 👈 ahora se usa aquí
 
+// Map de thunks por tipo de publicación (fuera del componente)
+const GET_BY_ID_PUB = {
+  Libro: getLibroById,
+  Articulo: getArticuloById,
+  Tesis: getTesisById,
+};
 
-  // Map de thunks por tipo de publicación (fuera del componente)
-  const GET_BY_ID_PUB = {
-    Libro: getLibroById,
-    Articulo: getArticuloById,
-    Tesis: getTesisById,
-  };
-  
 export default function Publicaciones() {
   const [search, setSearch] = useState("");
   const [tipo, setTipo] = useState("Publicacion");
@@ -133,7 +156,9 @@ export default function Publicaciones() {
     return libro.filter((l) => {
       if (!q) return true;
       return (
-        String(l.publicacion?.cod_lib ?? "").toLowerCase().includes(q) ||
+        String(l.publicacion?.cod_lib ?? "")
+          .toLowerCase()
+          .includes(q) ||
         (l.publicacion?.titulo ?? "").toLowerCase().includes(q) ||
         (l.publicacion?.autor ?? "").toLowerCase().includes(q) ||
         (l.publicacion?.genero ?? "").toLowerCase().includes(q) ||
@@ -147,7 +172,9 @@ export default function Publicaciones() {
     return articulo.filter((a) => {
       if (!q) return true;
       return (
-        String(a.cod_a ?? "").toLowerCase().includes(q) ||
+        String(a.cod_a ?? "")
+          .toLowerCase()
+          .includes(q) ||
         (a.titulo ?? "").toLowerCase().includes(q) ||
         (a.autor ?? "").toLowerCase().includes(q) ||
         (a.area ?? "").toLowerCase().includes(q)
@@ -160,7 +187,9 @@ export default function Publicaciones() {
     return tesis.filter((t) => {
       if (!q) return true;
       return (
-        String(t.cod_t ?? "").toLowerCase().includes(q) ||
+        String(t.cod_t ?? "")
+          .toLowerCase()
+          .includes(q) ||
         (t.titulo ?? "").toLowerCase().includes(q) ||
         (t.autor ?? "").toLowerCase().includes(q) ||
         (t.area ?? "").toLowerCase().includes(q)
@@ -173,28 +202,28 @@ export default function Publicaciones() {
     tipo === "Libro"
       ? estaCargandoLibro
       : tipo === "Artículo"
-      ? estaCargandoArticulo
-      : tipo === "Tesis"
-      ? estaCargandoTesis
-      : estaCargandoPublicacion;
+        ? estaCargandoArticulo
+        : tipo === "Tesis"
+          ? estaCargandoTesis
+          : estaCargandoPublicacion;
 
   const uiError =
     tipo === "Libro"
       ? errorLibro
       : tipo === "Artículo"
-      ? errorArticulo
-      : tipo === "Tesis"
-      ? errorTesis
-      : errorPublicacion;
+        ? errorArticulo
+        : tipo === "Tesis"
+          ? errorTesis
+          : errorPublicacion;
 
   const count =
     tipo === "Libro"
       ? filteredLibros.length
       : tipo === "Artículo"
-      ? filteredArticulo.length
-      : tipo === "Tesis"
-      ? filteredTesis.length
-      : filteredPublicaciones.length;
+        ? filteredArticulo.length
+        : tipo === "Tesis"
+          ? filteredTesis.length
+          : filteredPublicaciones.length;
 
   const empty = count === 0 && !isLoading;
 
@@ -269,7 +298,7 @@ export default function Publicaciones() {
         const res = await dispatch(thunk(id));
         if (!res?.ok) {
           throw new Error(
-            res?.error || `No se pudo obtener la ${tipoItem.toLowerCase()}`
+            res?.error || `No se pudo obtener la ${tipoItem.toLowerCase()}`,
           );
         }
 
@@ -283,7 +312,7 @@ export default function Publicaciones() {
         });
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   // ====== Handlers EDITAR (form) ======
@@ -299,7 +328,7 @@ export default function Publicaciones() {
         const res = await dispatch(thunk(id));
         if (!res?.ok) {
           throw new Error(
-            res?.error || `No se pudo obtener la ${tipoItem.toLowerCase()}`
+            res?.error || `No se pudo obtener la ${tipoItem.toLowerCase()}`,
           );
         }
 
@@ -317,7 +346,7 @@ export default function Publicaciones() {
         });
       }
     },
-    [dispatch, mapDetalleToForm]
+    [dispatch, mapDetalleToForm],
   );
 
   // ====== Archivar / activar publicación ======
@@ -334,8 +363,7 @@ export default function Publicaciones() {
         customClass: {
           confirmButton:
             "btn bg-slate-700 text-white hover:bg-slate-800 border-0",
-          cancelButton:
-            "btn btn-ghost border border-slate-300 text-slate-700",
+          cancelButton: "btn btn-ghost border border-slate-300 text-slate-700",
         },
       });
 
@@ -359,9 +387,7 @@ export default function Publicaciones() {
       }
 
       const nuevoEstado =
-        resp.data?.estado ??
-        resp.data?.publicacion?.estado ??
-        "DESCONOCIDO";
+        resp.data?.estado ?? resp.data?.publicacion?.estado ?? "DESCONOCIDO";
 
       await Swal.fire({
         icon: "success",
@@ -384,7 +410,7 @@ export default function Publicaciones() {
       if (tipo === "Tesis") await dispatch(getTesis());
       await dispatch(getPublicacion());
     },
-    [dispatch, tipo]
+    [dispatch, tipo],
   );
 
   // ====== Mapas de create/update ======
@@ -394,7 +420,7 @@ export default function Publicaciones() {
       Articulo: createArticulo,
       Tesis: createTesis,
     }),
-    []
+    [],
   );
 
   const UPDATE = useMemo(
@@ -403,7 +429,7 @@ export default function Publicaciones() {
       Articulo: updateArticulo,
       Tesis: updateTesis,
     }),
-    []
+    [],
   );
 
   // ====== Handler Submit (create / edit) ======
@@ -418,7 +444,7 @@ export default function Publicaciones() {
       closeForm();
 
       await new Promise((r) =>
-        requestAnimationFrame(() => requestAnimationFrame(r))
+        requestAnimationFrame(() => requestAnimationFrame(r)),
       );
 
       Swal.fire({
@@ -524,7 +550,7 @@ export default function Publicaciones() {
         setSubmitting(false);
       }
     },
-    [CREAR, UPDATE, dispatch, closeForm, focusAddBtn, editingId]
+    [CREAR, UPDATE, dispatch, closeForm, focusAddBtn, editingId],
   );
 
   // ====== Selección de detalle según tipoDetalle ======
@@ -532,28 +558,28 @@ export default function Publicaciones() {
     tipoDetalle === "Libro"
       ? detalleLibro
       : tipoDetalle === "Articulo"
-      ? detalleArticulo
-      : tipoDetalle === "Tesis"
-      ? detalleTesis
-      : null;
+        ? detalleArticulo
+        : tipoDetalle === "Tesis"
+          ? detalleTesis
+          : null;
 
   const loadingDetalleSeleccionado =
     tipoDetalle === "Libro"
       ? !!estaCargandoDetalleLibro
       : tipoDetalle === "Articulo"
-      ? !!estaCargandoDetalleArticulo
-      : tipoDetalle === "Tesis"
-      ? !!estaCargandoDetalleTesis
-      : false;
+        ? !!estaCargandoDetalleArticulo
+        : tipoDetalle === "Tesis"
+          ? !!estaCargandoDetalleTesis
+          : false;
 
   const errorDetalleSeleccionado =
     tipoDetalle === "Libro"
       ? errorDetalleLibro
       : tipoDetalle === "Articulo"
-      ? errorDetalleArticulo
-      : tipoDetalle === "Tesis"
-      ? errorDetalleTesis
-      : null;
+        ? errorDetalleArticulo
+        : tipoDetalle === "Tesis"
+          ? errorDetalleTesis
+          : null;
 
   // ====== Vista según tipo ======
   const view =
@@ -586,175 +612,98 @@ export default function Publicaciones() {
     }[tipo] ?? null;
 
   return (
-    <div>
-      <div className="mx-auto w-full max-w-9xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-4">
-        {/* Card título */}
-        <Card className="flex items-start gap-4">
-          <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center">
-            <GestorPub />
+    <div className="feature-page">
+      <PageHeader
+        title="Publicaciones"
+        description="Administra el catálogo, los ejemplares y la información de cada publicación."
+      >
+        <button
+          ref={addBtnRef}
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            document.activeElement?.blur?.();
+            setEditingId(null);
+            setEditingTipo(null);
+            setFormInitialValues(null);
+            setOpenForm(true);
+          }}
+        >
+          <Plus size={18} />
+          {tipo === "Libro"
+            ? "Nuevo libro"
+            : tipo === "Artículo"
+              ? "Nuevo artículo"
+              : tipo === "Tesis"
+                ? "Nueva tesis"
+                : "Nueva publicación"}
+        </button>
+      </PageHeader>
+      <section className="panel management-panel" aria-label="Publicaciones">
+        <div className="management-toolbar">
+          <Filter
+            value={search}
+            onChange={setSearch}
+            onClear={() => setSearch("")}
+            placeholder="Buscar por ID, título o autor"
+          />
+          <select
+            id="tipo"
+            className="select"
+            aria-label="Tipo de publicación"
+            value={tipo}
+            onChange={(event) => setTipo(event.target.value)}
+          >
+            <option value="Publicacion">Todos los tipos</option>
+            <option value="Libro">Libro</option>
+            <option value="Artículo">Artículo</option>
+            <option value="Tesis">Tesis</option>
+          </select>
+          <span className="result-count" role="status">
+            {isLoading ? "Cargando…" : `${count} publicaciones`}
+          </span>
+        </div>
+        {uiError && (
+          <div className="alert alert-error" role="alert">
+            Error al cargar: {String(uiError)}
           </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-slate-900">
-              Gestión de Publicaciones
-            </h2>
-            <p className="mt-1 text-slate-600">
-              Administra y organiza las publicaciones del sistema
+        )}
+        {isLoading ? (
+          <div className="empty-state" role="status">
+            Cargando publicaciones…
+          </div>
+        ) : empty ? (
+          <div className="empty-state">
+            <SearchX size={30} />
+            <h2>No encontramos publicaciones</h2>
+            <p>
+              Prueba con otro título o autor, o cambia el tipo seleccionado.
             </p>
           </div>
-        </Card>
-
-        {/* Card métrica */}
-        <Card>
-          <div className="flex items-start gap-3">
-            <div className="h-8 w-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-              <span className="text-slate-800">
-                <SearchPub />
-              </span>
-            </div>
-            <div className="flex-1">
-              <span className="text-sm text-slate-500"># Registros</span>
-              <div className="leading-tight text-4xl font-extrabold text-slate-700">
-                {isLoading ? "—" : count}
-              </div>
-              <div className="mt-2 text-xs text-slate-500">
-                Filtrado por:
-                <div className="font-medium text-slate-700 space-x-2">
-                  <span className="inline-flex items-center rounded-lg bg-slate-100 px-2 py-0.5">
-                    {tipo === "Publicacion" ? "Todos" : tipo}
-                  </span>
-                  {search && (
-                    <span className="inline-flex items-center rounded-lg bg-slate-100 px-2 py-0.5">
-                      Búsqueda: “{search}”
-                    </span>
-                  )}
-                </div>
-                {uiError && (
-                  <div className="mt-2 text-red-600">
-                    Error al cargar: {String(uiError)}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Filtros */}
-        <Card className="lg:col-span-2">
-          <div className="p-4 md:p-5 bg-base-100 rounded-xl">
-            <div className="grid grid-cols-1 md:grid-cols-[280px_1fr_auto] items-end gap-4">
-              {/* Filtrar por Tipo */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Filtrar por Tipo
-                </label>
-                <select
-                  id="tipo"
-                  className="select"
-                  value={tipo}
-                  onChange={(e) => setTipo(e.target.value)}
-                >
-                  <option value="Publicacion">Todos</option>
-                  <option value="Libro">Libro</option>
-                  <option value="Artículo">Artículo</option>
-                  <option value="Tesis">Tesis</option>
-                </select>
-              </div>
-
-              {/* Buscar */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Buscar{" "}
-                  {tipo === "Libro"
-                    ? "libro"
-                    : tipo === "Artículo"
-                    ? "artículo"
-                    : tipo === "Tesis"
-                    ? "tesis"
-                    : "publicación"}
-                </label>
-                <Filter
-                  className="flex-1 min-w-0"
-                  value={search}
-                  onChange={setSearch}
-                  onClear={() => setSearch("")}
-                  placeholder={"Id, Título, autor"}
-                />
-              </div>
-
-              {/* Botón Agregar */}
-              <div className="md:justify-self-end">
-                <button
-                  ref={addBtnRef}
-                  type="button"
-                  className="btn bg-slate-700 h-12 min-h-12 px-5 text-white hover:bg-slate-500"
-                  onClick={() => {
-                    document.activeElement?.blur?.();
-                    setEditingId(null);
-                    setEditingTipo(null);
-                    setFormInitialValues(null);
-                    setOpenForm(true);
-                  }}
-                  title={
-                    "Agregar " +
-                    (tipo === "Publicacion" ? "Publicación" : tipo)
-                  }
-                >
-                  <BtnAgregar />
-                  {"Agregar " +
-                    (tipo === "Publicacion" ? "Publicación" : tipo)}
-                </button>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Contenido principal */}
-        <Card className="lg:col-span-2">
-          {isLoading ? (
-            <div className="p-6 text-slate-600">Cargando...</div>
-          ) : empty ? (
-            <div className="p-6">
-              <div className="inline-flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-2 text-slate-700">
-                <span className="text-lg">🔎</span>
-                <span className="font-medium">
-                  {tipo === "Publicacion" ? "Todos" : tipo}: sin coincidencias
-                </span>
-              </div>
-              <p className="mt-3 text-sm text-slate-600">
-                No encontramos resultados para{" "}
-                <b>{search || "tu búsqueda"}</b>. Prueba con otros términos o
-                limpia el filtro.
-              </p>
-            </div>
-          ) : (
-            view
-          )}
-        </Card>
-
-        {/* Modal de Publicación (create / edit) */}
-        <PublicacionForm
-          open={openForm}
-          onClose={closeFormAndFocus}
-          initialTipo={editingTipo || tipoForm}
-          initialValues={formInitialValues}
-          submitting={submitting}
-          returnFocusRef={addBtnRef}
-          mode={editingId ? "edit" : "create"}
-          onSubmit={handleSubmit}
-        />
-
-        {/* Modal de Detalle (Libro / Artículo / Tesis) */}
-        {openDetalle && (
-          <DetallesPub
-            open={openDetalle}
-            onClose={() => setOpenDetalle(false)}
-            tipo={tipoDetalle}
-            detalle={detalleSeleccionado}
-            loading={loadingDetalleSeleccionado}
-            error={errorDetalleSeleccionado}
-          />
+        ) : (
+          view
         )}
-      </div>
+      </section>
+      <PublicacionForm
+        open={openForm}
+        onClose={closeFormAndFocus}
+        initialTipo={editingTipo || tipoForm}
+        initialValues={formInitialValues}
+        submitting={submitting}
+        returnFocusRef={addBtnRef}
+        mode={editingId ? "edit" : "create"}
+        onSubmit={handleSubmit}
+      />
+      {openDetalle && (
+        <DetallesPub
+          open={openDetalle}
+          onClose={() => setOpenDetalle(false)}
+          tipo={tipoDetalle}
+          detalle={detalleSeleccionado}
+          loading={loadingDetalleSeleccionado}
+          error={errorDetalleSeleccionado}
+        />
+      )}
     </div>
   );
 }

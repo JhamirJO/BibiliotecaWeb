@@ -4,10 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import EstadoPill from "@/components/EstadoPill";
 import { getPrestamo } from "@/actions/prestamoThunks";
 import { useSearchParams } from "react-router-dom";
-import icon from "@/img/libro.png";
-import "./comprobante.css"; // <--- nuevo import
+import { BookOpen, Printer } from "lucide-react";
+import "./Comprobante.css"; // <--- nuevo import
 
-const formatCodigo = (n) => `LIB-${String(n ?? 0).toString().padStart(3, "0")}`;
+const formatCodigo = (n) =>
+  `LIB-${String(n ?? 0)
+    .toString()
+    .padStart(3, "0")}`;
 
 function estadoGlobal(rows = []) {
   const s = new Set(rows.map((r) => String(r?.estado ?? "").toUpperCase()));
@@ -48,7 +51,6 @@ export default function Comprobante() {
       .map(([cid, rows]) => ({ comprobanteId: cid, rows }));
   }, [prestamos]);
 
-
   // Selección automática por ?cid o el más reciente
   const [selId, setSelId] = useState(null);
   useEffect(() => {
@@ -63,13 +65,13 @@ export default function Comprobante() {
 
   const seleccionado = useMemo(
     () => grupos.find((g) => g.comprobanteId === selId),
-    [grupos, selId]
+    [grupos, selId],
   );
 
   const items = useMemo(() => {
     if (!seleccionado) return [];
     return [...seleccionado.rows].sort(
-      (a, b) => (a.cod_pub ?? 0) - (b.cod_pub ?? 0)
+      (a, b) => (a.cod_pub ?? 0) - (b.cod_pub ?? 0),
     );
   }, [seleccionado]);
 
@@ -93,25 +95,31 @@ export default function Comprobante() {
   }, [autoPrint, seleccionado, estaCargandoLista]);
 
   return (
-    <div className="min-h-screen w-full bg-slate-100 flex flex-col items-center py-6">
+    <div className="receipt-page min-h-screen w-full bg-slate-100 flex flex-col items-center py-6">
       {/* ===== Hoja (aplica .compact según query) ===== */}
       <div className={`sheet ${compact ? "compact" : ""}`}>
         {/* Encabezado */}
         <div className="flex items-start justify-between avoid-break">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-xl soft-bg flex items-center justify-center text-slate-700">
-              <img src={icon} className="h-5 w-5" />
+              <BookOpen className="h-5 w-5" aria-hidden="true" />
             </div>
             <div>
-              <div className={`${compact ? "text-base" : "text-lg"} font-bold`}>Biblioteca</div>
-              <div className={`${compact ? "text-[11px]" : "text-sm"} text-slate-500`}>
+              <div className={`${compact ? "text-base" : "text-lg"} font-bold`}>
+                Biblioteca
+              </div>
+              <div
+                className={`${compact ? "text-[11px]" : "text-sm"} text-slate-500`}
+              >
                 Comprobante de préstamo
               </div>
             </div>
           </div>
           <div className="text-right">
             <div className="text-[10px] text-slate-500">N° Comprobante</div>
-            <div className={`${compact ? "text-xl" : "text-3xl"} font-extrabold text-slate-700`}>
+            <div
+              className={`${compact ? "text-xl" : "text-3xl"} font-extrabold text-slate-700`}
+            >
               {selId}
             </div>
           </div>
@@ -122,7 +130,9 @@ export default function Comprobante() {
           <div className="mt-3 text-sm text-slate-600">Cargando préstamos…</div>
         )}
         {error && !estaCargandoLista && (
-          <div className="mt-3 text-sm text-red-600">Ocurrió un error: {String(error)}</div>
+          <div className="mt-3 text-sm text-red-600">
+            Ocurrió un error: {String(error)}
+          </div>
         )}
 
         {/* Contenido */}
@@ -134,14 +144,18 @@ export default function Comprobante() {
                 compact ? "gap-3" : "gap-4"
               } grid-print-2 avoid-break`}
             >
-              <div className={`rounded-xl border border-slate-200 soft-bg ${compact ? "p-3" : "p-4"}`}>
+              <div
+                className={`rounded-xl border border-slate-200 soft-bg ${compact ? "p-3" : "p-4"}`}
+              >
                 <div className="text-[10px] text-slate-500">Nombre</div>
                 <div className="font-semibold">{nombre}</div>
                 <div className="mt-1.5 text-[10px] text-slate-500">DNI</div>
                 <div className="font-semibold">{dni}</div>
               </div>
 
-              <div className={`rounded-xl border border-slate-200 soft-bg ${compact ? "p-3" : "p-4"}`}>
+              <div
+                className={`rounded-xl border border-slate-200 soft-bg ${compact ? "p-3" : "p-4"}`}
+              >
                 <div className="text-[10px] text-slate-500">Estado</div>
                 <div className="mt-1">
                   <EstadoPill estado={estado} />
@@ -156,17 +170,27 @@ export default function Comprobante() {
               <table className="w-full print-table">
                 <thead className="soft-header text-slate-700 text-xs">
                   <tr>
-                    <th className="text-left px-2 py-1.5 col-id font-semibold">Id. Pub</th>
-                    <th className="text-left px-2 py-1.5 font-semibold">Título</th>
-                    <th className="text-left px-2 py-1.5 col-fp font-semibold">F. Préstamo</th>
-                    <th className="text-left px-2 py-1.5 col-fm font-semibold">F. Máx. Devolución</th>
+                    <th className="text-left px-2 py-1.5 col-id font-semibold">
+                      Id. Pub
+                    </th>
+                    <th className="text-left px-2 py-1.5 font-semibold">
+                      Título
+                    </th>
+                    <th className="text-left px-2 py-1.5 col-fp font-semibold">
+                      F. Préstamo
+                    </th>
+                    <th className="text-left px-2 py-1.5 col-fm font-semibold">
+                      F. Máx. Devolución
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="text-xs leading-tight">
                   {items.map((it) => (
                     <tr key={it.id_p}>
                       <td className="px-2 py-1.5">{it.cod_pub}</td>
-                      <td className="px-2 py-1.5 whitespace-normal break-words">{it.titulo}</td>
+                      <td className="px-2 py-1.5 whitespace-normal break-words">
+                        {it.titulo}
+                      </td>
                       <td className="px-2 py-1.5">{it.fecha_p}</td>
                       <td className="px-2 py-1.5">{it.fecha_max}</td>
                     </tr>
@@ -176,18 +200,30 @@ export default function Comprobante() {
             </div>
 
             {/* Firmas + notas */}
-            <div className={`${compact ? "mt-10" : "mt-20"} grid grid-cols-2 ${compact ? "gap-6" : "gap-8"} avoid-break`}>
+            <div
+              className={`${compact ? "mt-10" : "mt-20"} grid grid-cols-2 ${compact ? "gap-6" : "gap-8"} avoid-break`}
+            >
               <div className="text-center text-[11px] text-slate-500">
-                <div className="border-t border-dashed border-slate-300 pt-2">Firma del usuario</div>
+                <div className="border-t border-dashed border-slate-300 pt-2">
+                  Firma del usuario
+                </div>
               </div>
               <div className="text-center text-[11px] text-slate-500">
-                <div className="border-t border-dashed border-slate-300 pt-2">Firma del bibliotecario</div>
+                <div className="border-t border-dashed border-slate-300 pt-2">
+                  Firma del bibliotecario
+                </div>
               </div>
             </div>
 
             <div className="mt-10 text-[10px] text-slate-500 space-y-1 avoid-break">
-              <div>• La no devolución en la fecha máxima genera sanciones y/o multas.</div>
-              <div>• El usuario es responsable del buen estado del material prestado.</div>
+              <div>
+                • La no devolución en la fecha máxima genera sanciones y/o
+                multas.
+              </div>
+              <div>
+                • El usuario es responsable del buen estado del material
+                prestado.
+              </div>
               <div>• Conserve este comprobante para cualquier aclaración.</div>
             </div>
           </>
@@ -195,7 +231,7 @@ export default function Comprobante() {
       </div>
 
       {/* Botón (no se imprime) */}
-      <div className="no-print w-[210mm] mt-3 flex justify-end">
+      <div className="receipt-toolbar no-print mt-3 flex justify-end">
         <button
           type="button"
           className="btn btn-xs bg-slate-700 text-white hover:bg-slate-600"
@@ -203,7 +239,7 @@ export default function Comprobante() {
           disabled={!seleccionado}
           title="Imprimir / Guardar como PDF"
         >
-          Imprimir / PDF
+          <Printer size={16} aria-hidden="true" /> Imprimir / PDF
         </button>
       </div>
     </div>

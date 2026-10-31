@@ -1,20 +1,35 @@
+import PageHeader from "@/components/layout/PageHeader";
+import { Plus, SearchX } from "lucide-react";
 // src/pages/lector/Usuario.jsx
-import React, { useEffect, useMemo, useState, useRef, useCallback,} from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getLector, createLector, getLectorById,updateLector, toggleEstadoLector, } from "@/actions/lectorThunks";
-import { getBibliotecario, createBibliotecario, getBibliotecarioById, updateBibliotecario } from "@/actions/bibliotecarioThunks";
-import { deleteUsuarioById } from "@/actions/userThunks";
+import {
+  getLector,
+  createLector,
+  getLectorById,
+  updateLector,
+  toggleEstadoLector,
+} from "@/actions/lectorThunks";
+import {
+  getBibliotecario,
+  createBibliotecario,
+  getBibliotecarioById,
+  updateBibliotecario,
+} from "@/actions/bibliotecarioThunks";
+import { deleteUsuarioById } from "@/actions/UserThunks";
 import Filter from "@/components/Filter";
-import Card from "@/components/Card";
-import { BtnAgregarUsuario, GestorUsuario } from "@/utils/Icons";
 import { TableLector } from "./tables/TableLector";
 import { TableBibliotecario } from "./tables/TableBibliotecario";
 import UsuarioForms from "./UsuarioForms";
 import DetalleUser from "./DetalleUser";
 import Swal from "sweetalert2";
-import clsx from "clsx";
 import { useCurrentRole } from "@/general/hooks/useCurrentRole";
-
 
 // 👇 mapas para elegir thunks según tipo
 const getByIdThunkByTipo = {
@@ -88,10 +103,10 @@ export default function Usuario() {
 
   // --- cargas ---
   useEffect(() => {
-    if (safeTipo === "Lector" && !(lector?.length)) {
+    if (safeTipo === "Lector" && !lector?.length) {
       dispatch(getLector());
     }
-    if (safeTipo === "Bibliotecario" && !(bibliotecario?.length)) {
+    if (safeTipo === "Bibliotecario" && !bibliotecario?.length) {
       dispatch(getBibliotecario());
     }
   }, [dispatch, safeTipo, lector?.length, bibliotecario?.length]);
@@ -113,7 +128,7 @@ export default function Usuario() {
 
     return (lector ?? []).filter((row) => {
       const fullName = normalize(
-        `${row?.nombre ?? ""} ${row?.apellido ?? ""}`.trim()
+        `${row?.nombre ?? ""} ${row?.apellido ?? ""}`.trim(),
       );
       const nameHit = term && fullName.includes(term);
       const dniStr = row?.dni?.toString() ?? "";
@@ -130,7 +145,7 @@ export default function Usuario() {
 
     return (bibliotecario ?? []).filter((row) => {
       const fullName = normalize(
-        `${row?.nombre ?? ""} ${row?.apellido ?? ""}`.trim()
+        `${row?.nombre ?? ""} ${row?.apellido ?? ""}`.trim(),
       );
       const nameHit = term && fullName.includes(term);
       const dniStr = row?.dni?.toString() ?? "";
@@ -144,22 +159,22 @@ export default function Usuario() {
     safeTipo === "Lector"
       ? !!estaCargandoLector
       : safeTipo === "Bibliotecario"
-      ? !!estaCargandoBibliotecario
-      : false;
+        ? !!estaCargandoBibliotecario
+        : false;
 
   const uiError =
     safeTipo === "Lector"
       ? errorLector
       : safeTipo === "Bibliotecario"
-      ? errorBibliotecario
-      : null;
+        ? errorBibliotecario
+        : null;
 
   const count =
     safeTipo === "Lector"
-      ? filteredLector?.length ?? 0
+      ? (filteredLector?.length ?? 0)
       : safeTipo === "Bibliotecario"
-      ? filteredBibliotecario?.length ?? 0
-      : 0;
+        ? (filteredBibliotecario?.length ?? 0)
+        : 0;
 
   // ===========================
   // Map detalle -> form shape
@@ -219,7 +234,7 @@ export default function Usuario() {
         });
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   // === handler genérico para EDITAR ===
@@ -234,7 +249,7 @@ export default function Usuario() {
 
         if (!res?.ok) {
           throw new Error(
-            res?.error || `No se pudo obtener el ${tipoUsuario.toLowerCase()}`
+            res?.error || `No se pudo obtener el ${tipoUsuario.toLowerCase()}`,
           );
         }
 
@@ -249,7 +264,7 @@ export default function Usuario() {
         });
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   // === handler genérico para ELIMINAR ===
@@ -283,8 +298,7 @@ export default function Usuario() {
         buttonsStyling: false,
         customClass: {
           confirmButton: "btn bg-red-600 text-white hover:bg-red-700 border-0",
-          cancelButton:
-            "btn btn-ghost border border-slate-300 text-slate-700",
+          cancelButton: "btn btn-ghost border border-slate-300 text-slate-700",
         },
       });
 
@@ -327,7 +341,7 @@ export default function Usuario() {
         await dispatch(thunkAll());
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handleArchiveLector = useCallback(
@@ -344,8 +358,7 @@ export default function Usuario() {
         customClass: {
           confirmButton:
             "btn bg-slate-700 text-white hover:bg-slate-800 border-0",
-          cancelButton:
-            "btn btn-ghost border border-slate-300 text-slate-700",
+          cancelButton: "btn btn-ghost border border-slate-300 text-slate-700",
         },
       });
 
@@ -374,9 +387,7 @@ export default function Usuario() {
       await Swal.fire({
         icon: "success",
         title:
-          nuevoEstado === "ACTIVO"
-            ? "Lector activado"
-            : "Lector desactivado",
+          nuevoEstado === "ACTIVO" ? "Lector activado" : "Lector desactivado",
         text: `Estado actual: ${nuevoEstado}`,
         confirmButtonText: "OK",
         buttonsStyling: false,
@@ -386,7 +397,7 @@ export default function Usuario() {
         },
       });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const view =
@@ -396,7 +407,7 @@ export default function Usuario() {
           data={filteredLector}
           onView={(id) => handleView("Lector", id)}
           onEdit={(id) => handleEdit("Lector", id)}
-          onArchive={handleArchiveLector}          // este sí es solo para lector
+          onArchive={handleArchiveLector} // este sí es solo para lector
           onDelete={(row, id) => handleDelete("Lector", row, id)}
         />
       ),
@@ -406,9 +417,7 @@ export default function Usuario() {
             data={filteredBibliotecario}
             onView={(id) => handleView("Bibliotecario", id)}
             onEdit={(id) => handleEdit("Bibliotecario", id)}
-            onDelete={(row, id) =>
-              handleDelete("Bibliotecario", row, id)
-            } 
+            onDelete={(row, id) => handleDelete("Bibliotecario", row, id)}
           />
         ),
       }),
@@ -426,7 +435,7 @@ export default function Usuario() {
 
       // 2) esperamos 2 frames a que el <dialog> se desmonte
       await new Promise((r) =>
-        requestAnimationFrame(() => requestAnimationFrame(r))
+        requestAnimationFrame(() => requestAnimationFrame(r)),
       );
 
       const tipoSeleccionado = safeTipo;
@@ -497,8 +506,8 @@ export default function Usuario() {
                 ? "Lector actualizado"
                 : "Lector creado"
               : mode === "edit"
-              ? "Bibliotecario actualizado"
-              : "Bibliotecario creado",
+                ? "Bibliotecario actualizado"
+                : "Bibliotecario creado",
           confirmButtonText: "OK",
           buttonsStyling: false,
           customClass: {
@@ -509,7 +518,8 @@ export default function Usuario() {
 
         // refrescar tablas
         if (tipoSeleccionado === "Lector") await dispatch(getLector());
-        if (tipoSeleccionado === "Bibliotecario") await dispatch(getBibliotecario());
+        if (tipoSeleccionado === "Bibliotecario")
+          await dispatch(getBibliotecario());
 
         focusAddBtn();
       } catch (err) {
@@ -531,9 +541,8 @@ export default function Usuario() {
         setSubmitting(false);
       }
     },
-    [closeForm, dispatch, focusAddBtn, safeTipo, editingId]
+    [closeForm, dispatch, focusAddBtn, safeTipo, editingId],
   );
-
 
   // === Selección de detalle según tipo ===
   const detalleSeleccionado =
@@ -546,147 +555,71 @@ export default function Usuario() {
     safeTipo === "Lector" ? errorDetalleLector : errorDetalleBibliotecario;
 
   return (
-    <div>
-      <div className="mx-auto w-full max-w-9xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 gap-4">
-        {/* Card título */}
-        <Card className="flex items-start gap-4">
-          <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center">
-            <GestorUsuario />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-slate-900">
-              Gestión de Usuarios
-            </h2>
-            <p className="mt-1 text-slate-600">
-              Administra y organiza los usuarios del sistema
-            </p>
-          </div>
-        </Card>
-
-        {/* Card métrica */}
-        <Card>
-          <div className="flex items-start gap-3">
-            <div className="h-8 w-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-              <span className="text-slate-700">👤</span>
-            </div>
-            <div className="flex-1">
-              <span className="text-sm text-slate-500"># Registros</span>
-              <div className="leading-tight text-4xl font-extrabold text-slate-700">
-                {isLoading ? "—" : count}
-              </div>
-              <div className="mt-2 text-xs text-slate-500">
-                Filtrado por:
-                <div className="font-medium text-slate-700 space-x-2">
-                  <span className="inline-flex items-center rounded-lg bg-slate-100 px-2 py-0.5">
-                    {tipo}
-                  </span>
-                  {search && (
-                    <span className="inline-flex items-center rounded-lg bg-slate-100 px-2 py-0.5">
-                      Búsqueda: “{search}”
-                    </span>
-                  )}
-                </div>
-                {uiError && (
-                  <div className="mt-2 text-red-600">
-                    Error al cargar: {String(uiError)}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Filtros + botón */}
-        <Card className="lg:col-span-2">
-          <div className="p-4 md:p-5 bg-base-100 rounded-xl">
-            <div
-              className={clsx(
-                "grid grid-cols-1 items-end gap-4",
-                isAdmin
-                  ? "md:grid-cols-[280px_1fr_auto]"
-                  : "md:grid-cols-[1fr_auto]"
-              )}
+    <div className="feature-page">
+      <PageHeader
+        title="Usuarios"
+        description="Consulta los datos y administra las cuentas de la biblioteca."
+      >
+        <button
+          ref={addBtnRef}
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            document.activeElement?.blur?.();
+            setEditingId(null);
+            setInitialValues(null);
+            setOpen(true);
+          }}
+        >
+          <Plus size={18} />
+          Nuevo {safeTipo.toLowerCase()}
+        </button>
+      </PageHeader>
+      <section className="panel management-panel" aria-label="Usuarios">
+        <div className="management-toolbar">
+          <Filter
+            value={search}
+            onChange={setSearch}
+            onClear={() => setSearch("")}
+            placeholder="Buscar por nombre o DNI"
+          />
+          {isAdmin && (
+            <select
+              id="tipo"
+              className="select"
+              aria-label="Tipo de usuario"
+              value={safeTipo}
+              onChange={(event) => setTipo(event.target.value)}
             >
-              {/* Filtrar por Tipo (solo ADMIN) */}
-              {isAdmin && (
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Filtrar por Tipo
-                  </label>
-                  <select
-                    id="tipo"
-                    className="select"
-                    value={safeTipo}
-                    onChange={(e) => setTipo(e.target.value)}
-                  >
-                    <option value="Lector">Lector</option>
-                    <option value="Bibliotecario">Bibliotecario</option>
-                  </select>
-                </div>
-              )}
-
-              {/* Buscar */}
-              <div className="min-w-0">
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Buscar {safeTipo.toLowerCase()}
-                </label>
-                <Filter
-                  className="flex-1 min-w-0"
-                  value={search}
-                  onChange={setSearch}
-                  onClear={() => setSearch("")}
-                  placeholder={
-                    safeTipo === "Lector" || safeTipo === "Bibliotecario"
-                      ? "Nombre/Apellido o DNI"
-                      : "Buscar por término…"
-                  }
-                />
-              </div>
-
-              {/* Botón Agregar */}
-              <div className="md:justify-self-end">
-                <button
-                  ref={addBtnRef}
-                  type="button"
-                  className="btn bg-slate-700 h-12 min-h-12 px-5 text-white hover:bg-slate-500"
-                  onClick={() => {
-                    document.activeElement?.blur?.();
-                    setEditingId(null);
-                    setInitialValues(null);
-                    setOpen(true);
-                  }}
-                >
-                  <BtnAgregarUsuario />
-                  Agregar {safeTipo}
-                </button>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Contenido principal */}
-        <Card className="lg:col-span-2">
-          {isLoading ? (
-            <div className="p-6 text-slate-600">Cargando...</div>
-          ) : count === 0 ? (
-            <div className="p-6">
-              <div className="inline-flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-2 text-slate-700">
-                <span className="text-lg">🔎</span>
-                <span className="font-medium">{tipo}: sin coincidencias</span>
-              </div>
-              <p className="mt-3 text-sm text-slate-600">
-                No encontramos resultados para{" "}
-                <b>{search || "tu búsqueda"}</b>. Prueba con otros términos o
-                limpia el filtro.
-              </p>
-            </div>
-          ) : (
-            view
+              <option value="Lector">Lector</option>
+              <option value="Bibliotecario">Bibliotecario</option>
+            </select>
           )}
-        </Card>
-      </div>
-
-      {/* Modal de creación / edición de usuario */}
+          <span className="result-count" role="status">
+            {isLoading
+              ? "Cargando…"
+              : `${count} ${safeTipo === "Lector" ? "lectores" : "bibliotecarios"}`}
+          </span>
+        </div>
+        {uiError && (
+          <div className="alert alert-error" role="alert">
+            Error al cargar: {String(uiError)}
+          </div>
+        )}
+        {isLoading ? (
+          <div className="empty-state" role="status">
+            Cargando usuarios…
+          </div>
+        ) : count === 0 ? (
+          <div className="empty-state">
+            <SearchX size={30} />
+            <h2>No encontramos usuarios</h2>
+            <p>Prueba con otro nombre o DNI, o limpia la búsqueda.</p>
+          </div>
+        ) : (
+          view
+        )}
+      </section>
       <UsuarioForms
         open={open}
         onClose={closeForm}
@@ -698,8 +631,6 @@ export default function Usuario() {
         returnFocusRef={addBtnRef}
         onCreated={handleSubmitUsuario}
       />
-
-      {/* Modal de detalle (Lector / Bibliotecario) */}
       {(safeTipo === "Lector" || safeTipo === "Bibliotecario") && (
         <DetalleUser
           open={openDetalle}
