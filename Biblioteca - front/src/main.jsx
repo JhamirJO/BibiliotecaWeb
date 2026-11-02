@@ -9,6 +9,7 @@ import { loadSessionThunk } from "@/actions/authThunks"; // <-- importa esto
 import "./index.css";
 import "./styles/theme.css";
 import "./styles/public.css";
+import "./styles/records.css";
 import App from "./App.jsx";
 
 // Rehidrata auth desde localStorage (sincrónico y muy rápido)

@@ -38,6 +38,7 @@ export default function GenericTable({
   paginationMode = "client",
   pageSizeOptions = [5, 10, 20, 50],
 
+  isActionDisabled,
   showViewAction = true,
   showEditAction = true,
   showArchiveAction = true,
@@ -50,19 +51,20 @@ export default function GenericTable({
 
   const [uncontrolledPage, setUncontrolledPage] = useState(0);
   const [uncontrolledPageSize, setUncontrolledPageSize] = useState(10);
-  const page = controlledPage ?? uncontrolledPage;
+  const requestedPage = controlledPage ?? uncontrolledPage;
   const pageSize = controlledPageSize ?? uncontrolledPageSize;
 
   const total =
     paginationMode === "server" ? (totalRows ?? data.length) : data.length;
 
+  const maxPage = Math.max(0, Math.ceil(total / pageSize) - 1);
+  const page = Math.min(requestedPage, maxPage);
   const pagedData = useMemo(() => {
     if (paginationMode === "server") return data;
     const start = page * pageSize;
     return data.slice(start, start + pageSize);
   }, [data, page, pageSize, paginationMode]);
 
-  const maxPage = Math.max(0, Math.ceil(total / pageSize) - 1);
   const startRow = total === 0 ? 0 : page * pageSize + 1;
   const endRow =
     total === 0
@@ -105,7 +107,7 @@ export default function GenericTable({
           className="table-scroll"
           tabIndex={0}
           role="region"
-          aria-label="Tabla de registros"
+          aria-label={title || "Tabla de registros"}
         >
           <table
             className={cx(
@@ -117,9 +119,10 @@ export default function GenericTable({
               <tr>
                 {columns.map((col) => (
                   <th
+                    scope="col"
                     key={col.id}
                     className={cx(
-                      "break-words whitespace-nowrap text-center", // 👈 siempre centrado
+                      "break-words whitespace-nowrap",
                       col.width, // respeta el width
                       col.headerClass,
                     )}
@@ -180,9 +183,11 @@ export default function GenericTable({
                             <button
                               className="btn btn-ghost btn-xs btn-circle text-success"
                               aria-label="Ver"
+                              title="Ver"
+                              disabled={isActionDisabled?.(row)}
                               type="button"
                               onClick={() => {
-                                if (onView) onView(id);
+                                if (onView) onView(id, row);
                                 else console.log("View ID ->", id);
                               }}
                             >
@@ -194,10 +199,12 @@ export default function GenericTable({
                             <button
                               className="btn btn-ghost btn-xs btn-circle text-primary"
                               aria-label="Editar"
+                              title="Editar"
+                              disabled={isActionDisabled?.(row)}
                               type="button"
                               onClick={() =>
                                 onEdit
-                                  ? onEdit(id)
+                                  ? onEdit(id, row)
                                   : console.log("Edit ID ->", id)
                               }
                             >
@@ -209,6 +216,8 @@ export default function GenericTable({
                             <button
                               className="btn btn-ghost btn-xs btn-circle text-amber-600"
                               aria-label="Archivar"
+                              title="Archivar"
+                              disabled={isActionDisabled?.(row)}
                               type="button"
                               onClick={() =>
                                 onArchive
@@ -224,6 +233,8 @@ export default function GenericTable({
                             <button
                               className="btn btn-ghost btn-xs btn-circle text-error"
                               aria-label="Eliminar"
+                              title="Eliminar"
+                              disabled={isActionDisabled?.(row)}
                               type="button"
                               onClick={() =>
                                 onDelete

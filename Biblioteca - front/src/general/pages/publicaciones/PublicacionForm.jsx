@@ -1,3 +1,6 @@
+import { ArrowLeft, BookOpen } from "lucide-react";
+import PageHeader from "@/components/layout/PageHeader";
+import useRecordView from "@/general/hooks/useRecordView";
 // PublicacionForm.jsx
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import Input from "@/components/Input";
@@ -13,8 +16,7 @@ export default function PublicacionForm({
   returnFocusRef,
   mode = "create", // 👈 NUEVO
 }) {
-  const dialogRef = useRef(null);
-  const boxRef = useRef(null);
+  const recordRef = useRecordView(open, onClose, submitting);
   const fileRef = useRef(null);
   const [portadaFile, setPortadaFile] = useState(null);
   const [portadaPreview, setPortadaPreview] = useState(null);
@@ -75,22 +77,7 @@ export default function PublicacionForm({
       setForm(EMPTY);
       setTipo(initialTipo || "Libro");
     }
-  }, [initialValues, initialTipo, EMPTY]);
-
-  // Control modal
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
-
-    if (open) {
-      requestAnimationFrame(() => {
-        if (boxRef.current) boxRef.current.focus();
-        else dialog?.focus();
-      });
-    }
-  }, [open]);
+  }, [initialValues, initialTipo, EMPTY, open]);
 
   useEffect(() => {
     if (!portadaFile) {
@@ -108,12 +95,6 @@ export default function PublicacionForm({
     setPortadaPreview(null);
     if (fileRef.current) fileRef.current.value = "";
   };
-
-  const handleOverlayClick = (e) => {
-    const dialog = dialogRef.current;
-    if (dialog && e.target === dialog) handleCancel();
-  };
-  const handleEsc = (e) => e.key === "Escape" && handleCancel();
 
   const handleCancel = () => {
     onClose?.();
@@ -643,17 +624,6 @@ export default function PublicacionForm({
     ),
   };
 
-  // (dejo BASE_FIELDS, EXTRA_BY_TIPO y activeSpecs igual que ya los tienes)
-
-  const BASE_FIELDS = [
-    { key: "tipo", order: 10, span: 1 },
-    { key: "titulo", order: 20, span: 1 },
-    { key: "autor", order: 30, span: 1 },
-    { key: "stock_pag", order: 900, span: 1 },
-    { key: "resumen", order: 1000, span: 1 },
-    { key: "portada", order: 1005, span: 1 },
-  ];
-
   const EXTRA_BY_TIPO = {
     Libro: [
       { key: "genero", order: 40, span: 1 },
@@ -677,11 +647,6 @@ export default function PublicacionForm({
     ],
   };
 
-  const activeSpecs = (() => {
-    const extras = EXTRA_BY_TIPO[tipo] || [];
-    return [...BASE_FIELDS, ...extras].sort((a, b) => a.order - b.order);
-  })();
-
   const ctx = { tipo, form, handleTipoChange, handleChange };
 
   // 👇 título dinámico según tipo + modo
@@ -691,49 +656,76 @@ export default function PublicacionForm({
     ? `Editar ${humanTipo.toLowerCase()}`
     : `${tipo === "Tesis" ? "Nueva" : "Nuevo"} ${humanTipo.toLowerCase()}`;
 
-  return (
-    <dialog
-      ref={dialogRef}
-      className="modal"
-      onClick={handleOverlayClick}
-      onKeyDown={handleEsc}
-      aria-label="Formulario de publicación"
-      aria-modal="true"
-    >
+  if (!open) return null;
+  const renderFields = (keys) =>
+    keys.map((key) => (
       <div
-        ref={boxRef}
-        className="modal-box max-w-3xl p-0 flex flex-col max-w-4xl max-h-[90vh] min-h-0"
-        tabIndex={-1}
+        key={key}
+        className={
+          [
+            "autor",
+            "stock_pag",
+            "resumen",
+            "portada",
+            "titulo_revista",
+            "palabras_clave",
+          ].includes(key)
+            ? "field-full"
+            : ""
+        }
       >
-        {/* Header */}
-        <div className="bg-slate-700 text-white px-6 py-4 shrink-0">
-          <h3 className="text-lg md:text-xl font-semibold">{title}</h3>
-          <p className="text-sm opacity-90">
-            Completa los campos según el tipo seleccionado.
-          </p>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
-          <div className="flex-1 min-h-0 overflow-y-auto p-6 overscroll-contain">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {activeSpecs.map(({ key, span = 1 }) => {
-                const spanClass =
-                  span === 2
-                    ? "md:col-span-2"
-                    : span === 3
-                      ? "md:col-span-3"
-                      : "";
-                return (
-                  <div key={key} className={spanClass}>
-                    {Fields[key](ctx)}
-                  </div>
-                );
-              })}
+        {Fields[key](ctx)}
+      </div>
+    ));
+  return (
+    <section
+      ref={recordRef}
+      className="record-page publication-form-page"
+      aria-label="Formulario de publicación"
+    >
+      <PageHeader
+        title={title}
+        section="Publicaciones"
+        description={
+          isEdit
+            ? "Actualiza la información de la publicación y sus ejemplares."
+            : "Registra un libro, artículo o tesis en el catálogo."
+        }
+      >
+        <button
+          type="button"
+          className="btn"
+          onClick={handleCancel}
+          disabled={submitting}
+        >
+          <ArrowLeft size={17} />
+          Volver a publicaciones
+        </button>
+      </PageHeader>
+      <div className="record-form-layout">
+        <form className="panel record-form" onSubmit={handleSubmit}>
+          <fieldset className="record-form-section">
+            <legend>Datos de la publicación</legend>
+            <p>Los campos marcados con * son obligatorios.</p>
+            <div className="record-form-grid">
+              {renderFields(["tipo", "titulo", "autor"])}
             </div>
-          </div>
-
-          <div className="shrink-0 flex flex-col md:flex-row gap-3 md:justify-end px-6 py-3 border-t bg-base-100">
+          </fieldset>
+          <fieldset className="record-form-section">
+            <legend>Información específica</legend>
+            <p>Completa los datos correspondientes al tipo de publicación.</p>
+            <div className="record-form-grid">
+              {renderFields((EXTRA_BY_TIPO[tipo] || []).map(({ key }) => key))}
+            </div>
+          </fieldset>
+          <fieldset className="record-form-section">
+            <legend>Ejemplares y descripción</legend>
+            <p>Información visible en la ficha de la publicación.</p>
+            <div className="record-form-grid">
+              {renderFields(["stock_pag", "resumen", "portada"])}
+            </div>
+          </fieldset>
+          <footer className="record-form-actions">
             <button
               type="button"
               className="btn btn-ghost"
@@ -744,7 +736,7 @@ export default function PublicacionForm({
             </button>
             <button
               type="button"
-              className="btn bg-red-500 text-white hover:bg-red-400"
+              className="btn"
               onClick={handleCancel}
               disabled={submitting}
             >
@@ -752,29 +744,38 @@ export default function PublicacionForm({
             </button>
             <button
               type="submit"
-              className="btn bg-slate-700 text-white hover:bg-slate-500"
+              className="btn btn-primary"
               disabled={submitting}
             >
               {submitting
-                ? "Guardando..."
+                ? "Guardando…"
                 : isEdit
                   ? "Guardar cambios"
-                  : "Guardar"}
+                  : "Guardar publicación"}
             </button>
-          </div>
+          </footer>
         </form>
+        <aside className="record-note">
+          <span className="eyebrow">Catálogo bibliográfico</span>
+          <BookOpen size={30} strokeWidth={1.4} />
+          <h2>
+            Una ficha completa,
+            <br />
+            una mejor consulta.
+          </h2>
+          <p>
+            Revisa el título, los autores y los datos específicos antes de
+            guardar la publicación.
+          </p>
+          <hr />
+          <h3>Portada de la publicación</h3>
+          <p>Usa una imagen vertical en JPG, PNG o WebP, de hasta 5 MB.</p>
+          <p>
+            El número de copias indica los ejemplares registrados en biblioteca.
+          </p>
+        </aside>
       </div>
-
-      <form method="dialog" className="modal-backdrop">
-        <button
-          aria-label="Cerrar"
-          onClick={handleCancel}
-          disabled={submitting}
-        >
-          close
-        </button>
-      </form>
-    </dialog>
+    </section>
   );
 }
 

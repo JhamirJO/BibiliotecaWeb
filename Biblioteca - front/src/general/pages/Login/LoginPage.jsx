@@ -33,7 +33,6 @@ export default function LoginPage() {
                 préstamos.
               </p>
             </div>
-            <small>Universidad Nacional Mayor de San Marcos</small>
           </div>
         </section>
       </main>

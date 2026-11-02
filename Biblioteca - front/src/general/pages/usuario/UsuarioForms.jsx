@@ -1,5 +1,8 @@
+import { ArrowLeft, UserRound } from "lucide-react";
+import PageHeader from "@/components/layout/PageHeader";
+import useRecordView from "@/general/hooks/useRecordView";
 // src/pages/lector/UsuarioForms.jsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Input from "@/components/Input";
 
 export default function UsuarioForms({
@@ -13,8 +16,7 @@ export default function UsuarioForms({
   returnFocusRef, // opcional, para devolver el foco
   mode = "create", // "create" | "edit"
 }) {
-  const dialogRef = useRef(null);
-  const boxRef = useRef(null);
+  const recordRef = useRecordView(open, onClose, creating);
 
   const isEdit = mode === "edit";
 
@@ -60,35 +62,7 @@ export default function UsuarioForms({
     } else {
       setForm(EMPTY);
     }
-  }, [initialValues, EMPTY]);
-
-  // Control del <dialog> (apertura/cierre + foco)
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
-
-    if (open) {
-      requestAnimationFrame(() => {
-        if (boxRef.current) boxRef.current.focus();
-        else dialog?.focus();
-      });
-    } else {
-      // al cerrar, limpiamos el formulario
-      setForm(EMPTY);
-    }
-  }, [open, EMPTY]);
-
-  const handleOverlayClick = (e) => {
-    const dialog = dialogRef.current;
-    if (dialog && e.target === dialog) handleCancel();
-  };
-
-  const handleEsc = (e) => {
-    if (e.key === "Escape") handleCancel();
-  };
+  }, [initialValues, EMPTY, open]);
 
   const handleCancel = () => {
     onClose?.();
@@ -327,29 +301,6 @@ export default function UsuarioForms({
   };
 
   // Campos base (comunes a ambos roles)
-  const BASE_FIELDS = [
-    // User
-    { key: "user_username", order: 10, span: 1 },
-    { key: "user_password", order: 20, span: 1 },
-    { key: "user_email", order: 60, span: 1 },
-
-    // Persona
-    { key: "persona_nombre", order: 30, span: 1 },
-    { key: "persona_apellido", order: 40, span: 1 },
-    { key: "persona_dni", order: 50, span: 1 },
-    { key: "persona_telefono", order: 70, span: 1 },
-  ];
-
-  // Extra según rol
-  const EXTRA_BY_TIPO = {
-    Lector: [{ key: "lector_direccion", order: 80, span: 1 }],
-  };
-
-  const activeSpecs = (() => {
-    const extras = EXTRA_BY_TIPO[tipo] || [];
-    return [...BASE_FIELDS, ...extras].sort((a, b) => a.order - b.order);
-  })();
-
   const ctx = {
     tipo,
     form,
@@ -361,69 +312,78 @@ export default function UsuarioForms({
   // ======================
   // Render
   // ======================
-  const title = isEdit
-    ? tipo === "Bibliotecario"
-      ? "Editar Bibliotecario"
-      : "Editar Lector"
-    : tipo === "Bibliotecario"
-      ? "Nuevo Bibliotecario"
-      : "Nuevo Lector";
+  const title = `${isEdit ? "Editar" : "Nuevo"} ${tipo.toLowerCase()}`;
 
-  return (
-    <dialog
-      ref={dialogRef}
-      className="modal"
-      onClick={handleOverlayClick}
-      onKeyDown={handleEsc}
-      aria-label="Formulario de usuario"
-      aria-modal="true"
-    >
+  if (!open) return null;
+  const renderFields = (keys) =>
+    keys.map((key) => (
       <div
-        ref={boxRef}
-        className="modal-box max-w-2xl p-0 flex flex-col max-h-[90vh] min-h-0"
-        tabIndex={-1}
+        key={key}
+        className={
+          ["lector_direccion", "user_password"].includes(key)
+            ? "field-full"
+            : ""
+        }
       >
-        {/* Header */}
-        <div className="bg-slate-700 text-white px-6 py-4 shrink-0">
-          <h3 className="text-lg md:text-xl font-semibold">{title}</h3>
-          <p className="text-sm opacity-90">
-            Completa los datos de acceso y de la persona.
-            {tipo === "Lector" &&
-              " La dirección se registra como dato del lector."}
-          </p>
+        {Fields[key](ctx)}
+      </div>
+    ));
+  return (
+    <section
+      ref={recordRef}
+      className="record-page user-form-page"
+      aria-label="Formulario de usuario"
+    >
+      <PageHeader
+        title={title}
+        section="Usuarios"
+        description={
+          isEdit
+            ? "Actualiza la información personal y los datos de acceso."
+            : "Completa los datos personales y crea la cuenta de acceso al portal."
+        }
+      >
+        <button
+          type="button"
+          className="btn"
+          onClick={handleCancel}
+          disabled={creating}
+        >
+          <ArrowLeft size={17} />
+          Volver a usuarios
+        </button>
+      </PageHeader>
+      <div className="record-form-layout">
+        <form className="panel record-form" onSubmit={handleSubmit}>
           {error && (
-            <p className="mt-2 text-xs bg-red-500/20 border border-red-400 text-red-50 rounded px-3 py-1.5">
+            <div className="record-form-error alert alert-error" role="alert">
               {String(error)}
-            </p>
-          )}
-        </div>
-
-        {/* Formulario */}
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
-          {/* Body con scroll */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-6 overscroll-contain">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {activeSpecs.map(({ key, span = 1 }) => {
-                const spanClass =
-                  span === 2
-                    ? "md:col-span-2"
-                    : span === 3
-                      ? "md:col-span-3"
-                      : "";
-                return (
-                  <div key={key} className={spanClass}>
-                    {Fields[key](ctx)}
-                  </div>
-                );
-              })}
             </div>
-          </div>
-
-          {/* Footer */}
-          <div className="shrink-0 flex flex-col md:flex-row gap-3 md:justify-end px-6 py-3 border-t bg-base-100">
+          )}
+          <fieldset className="record-form-section">
+            <legend>Datos personales</legend>
+            <p>Los campos marcados con * son obligatorios.</p>
+            <div className="record-form-grid">
+              {renderFields([
+                "persona_nombre",
+                "persona_apellido",
+                "persona_dni",
+                "persona_telefono",
+                ...(tipo === "Lector" ? ["lector_direccion"] : []),
+              ])}
+            </div>
+          </fieldset>
+          <fieldset className="record-form-section">
+            <legend>Datos de acceso</legend>
+            <p>La cuenta se utilizará para ingresar al portal.</p>
+            <div className="record-form-grid">
+              {renderFields(["user_username", "user_email", "user_password"])}
+            </div>
+          </fieldset>
+          <footer className="record-form-actions">
             <button
               type="button"
-              className="btn btn-ghost"
+              className="btn"
               onClick={handleCancel}
               disabled={creating}
             >
@@ -431,27 +391,40 @@ export default function UsuarioForms({
             </button>
             <button
               type="submit"
-              className="btn bg-slate-700 text-white hover:bg-slate-500"
+              className="btn btn-primary"
               disabled={creating}
             >
               {creating
-                ? isEdit
-                  ? "Guardando..."
-                  : "Creando..."
+                ? "Guardando…"
                 : isEdit
                   ? "Guardar cambios"
-                  : "Crear"}
+                  : "Guardar usuario"}
             </button>
-          </div>
+          </footer>
         </form>
+        <aside className="record-note">
+          <span className="eyebrow">{tipo}</span>
+          <UserRound size={30} strokeWidth={1.4} />
+          <h2>
+            Información
+            <br />
+            de la cuenta
+          </h2>
+          <p>
+            {tipo === "Lector"
+              ? "El lector tendrá acceso al catálogo, a su historial de préstamos y a los datos de su perfil."
+              : "El bibliotecario tendrá acceso a los módulos de gestión autorizados para su rol."}
+          </p>
+          <hr />
+          <p>
+            La creación de bibliotecarios corresponde al administrador del
+            sistema.
+          </p>
+          {isEdit && (
+            <p>Conserva la contraseña vacía si no deseas modificarla.</p>
+          )}
+        </aside>
       </div>
-
-      {/* Backdrop */}
-      <form method="dialog" className="modal-backdrop">
-        <button aria-label="Cerrar" onClick={handleCancel} disabled={creating}>
-          close
-        </button>
-      </form>
-    </dialog>
+    </section>
   );
 }

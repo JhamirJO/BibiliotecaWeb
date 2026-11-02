@@ -254,7 +254,6 @@ export default function Dashboard() {
         <Outlet />
       </main>
       <footer className="workspace-footer">
-        <span>Biblioteca · Universidad Nacional Mayor de San Marcos</span>
         <span>© {new Date().getFullYear()} · Portal bibliotecario</span>
       </footer>
     </div>

@@ -29,7 +29,7 @@ Biblioteca/
 * Vite
 * Redux Toolkit
 * React Router
-* Tailwind CSS y DaisyUI
+* Tailwind CSS
 
 ## Requisitos
 
@@ -83,15 +83,4 @@ cd "Biblioteca - back"
 cd "Biblioteca - front"
 npm install
 npm run dev
-```
-
-## Archivos que no deben subirse
-
-Los siguientes archivos y carpetas deben mantenerse fuera del repositorio:
-
-```text
-.env
-node_modules/
-target/
-dist/
 ```

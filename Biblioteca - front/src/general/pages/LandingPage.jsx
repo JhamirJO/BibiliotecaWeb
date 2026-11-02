@@ -65,7 +65,6 @@ export default function LandingPage() {
         Saltar al contenido
       </a>
       <div className="university-bar">
-        <span>Universidad Nacional Mayor de San Marcos</span>
         <span>Portal bibliotecario</span>
       </div>
       <header className="public-header">
@@ -201,7 +200,6 @@ export default function LandingPage() {
               <div>
                 <dt>Ubicación</dt>
                 <dd>
-                  Universidad Nacional Mayor de San Marcos
                   <br />
                   Lima, Perú
                 </dd>
@@ -220,7 +218,7 @@ export default function LandingPage() {
         </section>
       </main>
       <footer className="public-footer">
-        <span>Biblioteca · Universidad Nacional Mayor de San Marcos</span>
+        <span>Biblioteca</span>
         <span>
           © {new Date().getFullYear()} · Todos los derechos reservados
         </span>

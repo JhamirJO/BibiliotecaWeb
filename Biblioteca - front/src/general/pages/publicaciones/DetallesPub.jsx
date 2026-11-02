@@ -1,21 +1,12 @@
-// src/components/DetallesPub.jsx
-import React, { useMemo, useEffect, useRef } from "react";
-import portadaFallback from "../../../img/NoImagen.png";
-
+import { useMemo } from "react";
+import { ArrowLeft } from "lucide-react";
+import PageHeader from "@/components/layout/PageHeader";
+import RecordFields from "@/components/layout/RecordFields";
+import EstadoPill from "@/components/EstadoPill";
+import useRecordView from "@/general/hooks/useRecordView";
+import portadaFallback from "@/img/NoImagen.png";
 const urlBack = import.meta.env.VITE_APP_BACKEND_URL;
 const apiPub = import.meta.env.VITE_APP_API_Publicacion;
-
-/* Badge (chips) */
-const Badge = ({ children }) => (
-  <span className="inline-flex items-center rounded-full bg-slate-200/70 px-2.5 py-0.5 text-xs text-slate-700">
-    {children}
-  </span>
-);
-
-const Skeleton = () => (
-  <div className="h-4 rounded bg-slate-200 animate-pulse" />
-);
-
 const coalesce = (obj, keys = []) => {
   for (const k of keys) {
     const v = obj?.[k];
@@ -58,28 +49,14 @@ export default function DetallesPub({
   loading,
   error,
 }) {
+  const root = useRecordView(open, onClose);
   const pub = detalle?.publicacion;
   const autores = parseAutores(pub?.autor);
-
-  /* ⬅️ NUEVO: construye la URL de portada con fallback local */
   const portadaSrc = useMemo(() => {
-    const codPub = getCodPub(detalle);
-    return codPub ? `${urlBack}${apiPub}/portada/${codPub}` : portadaFallback;
+    const id = getCodPub(detalle);
+    return id ? `${urlBack}${apiPub}/portada/${id}` : portadaFallback;
   }, [detalle]);
-
-  const dialogRef = useRef(null);
-  useEffect(() => {
-    if (!open || !dialogRef.current) return;
-    const previous = document.activeElement;
-    const dialog = dialogRef.current;
-    if (!dialog.open) dialog.showModal();
-    return () => {
-      if (dialog.open) dialog.close();
-      previous?.focus?.();
-    };
-  }, [open]);
   if (!open) return null;
-
   const porTipo = {
     Libro: [
       { label: "ID libro", value: detalle?.libro?.cod_lib },
@@ -109,141 +86,84 @@ export default function DetallesPub({
     ],
   };
 
+  const kind = tipo === "Articulo" ? "Artículo" : tipo;
+  const technical = [
+    ...(porTipo[kind] || []),
+    { label: "Páginas", value: pub?.cant_pag },
+    { label: "Copias", value: pub?.stock },
+  ].filter(
+    (item) =>
+      item.value !== undefined && item.value !== null && item.value !== "",
+  );
   return (
-    <dialog
-      ref={dialogRef}
-      className="modal"
+    <section
+      ref={root}
+      className="record-page publication-detail-page"
       aria-label="Ficha de publicación"
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
     >
-      <div className="modal-box max-w-4xl p-0 overflow-hidden h-[90vh] max-h-[90vh]">
-        <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] h-full min-h-0">
-          {/* Izquierda */}
-          <aside className="bg-slate-700 text-slate-50 p-5 md:p-6 flex flex-col">
-            <div className="rounded-lg overflow-hidden aspect-[3/4] ring-1 ring-black/10">
+      <PageHeader
+        title="Detalle de publicación"
+        section="Catálogo bibliográfico"
+        description="Información de la publicación y disponibilidad en biblioteca."
+      >
+        <button type="button" className="btn" onClick={onClose}>
+          <ArrowLeft size={17} />
+          Volver al listado
+        </button>
+      </PageHeader>
+      {loading ? (
+        <div className="panel record-loading" role="status">
+          <span className="loading" />
+          Cargando ficha de publicación…
+        </div>
+      ) : error ? (
+        <div className="alert alert-error" role="alert">
+          {String(error)}
+        </div>
+      ) : !detalle ? (
+        <div className="panel empty-state">No hay información disponible.</div>
+      ) : (
+        <div className="publication-detail-layout">
+          <aside className="publication-detail-cover">
+            <div className="publication-detail-image">
               <img
                 src={portadaSrc}
-                alt="Portada"
-                className="h-full w-full object-cover"
-                loading="lazy"
-                onError={(e) => {
-                  e.currentTarget.src = portadaFallback;
+                alt={`Portada de ${pub?.titulo || "la publicación"}`}
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = portadaFallback;
                 }}
               />
             </div>
-            <div className="mt-4">
-              <div className="text-xs uppercase tracking-wide text-slate-300">
-                {tipo}
-              </div>
-              <h2 className="mt-1 text-lg font-semibold leading-snug">
-                {pub?.titulo ?? "—"}
-              </h2>
+            <div className="publication-stock">
+              <EstadoPill estado={pub?.estado} />
+              <span>{pub?.stock ?? "—"} copias en biblioteca</span>
             </div>
           </aside>
-
-          {/* Derecha con scroll interno */}
-          <section className="bg-slate-50 p-5 md:p-6 flex flex-col h-full min-h-0">
-            {/* Chips */}
-            <div className="flex flex-wrap gap-2 shrink-0">
-              {tipo && <Badge>{tipo}</Badge>}
-              {pub?.stock !== undefined && <Badge>Stock: {pub.stock}</Badge>}
-              {pub?.cant_pag !== undefined && (
-                <Badge>Páginas: {pub.cant_pag}</Badge>
-              )}
-              {pub?.id_pub !== undefined && <Badge>ID Pub: {pub.id_pub}</Badge>}
+          <article className="panel publication-detail-content">
+            <div className="publication-detail-heading">
+              <span className="eyebrow">
+                {kind} · PUB{String(getCodPub(detalle) ?? "").padStart(2, "0")}
+              </span>
+              <h2>{pub?.titulo || "Sin título"}</h2>
+              <p className="publication-detail-author">
+                {autores.join(" · ") || "Autor no registrado"}
+              </p>
             </div>
-
-            {/* Scrollable */}
-            <div className="mt-5 flex-1 min-h-0 overflow-y-auto pr-1 space-y-5">
-              {loading && (
-                <div className="space-y-2">
-                  <Skeleton />
-                  <Skeleton />
-                  <Skeleton />
-                  <Skeleton />
-                </div>
-              )}
-
-              {!loading && error && (
-                <div className="p-3 rounded-lg border border-red-200 text-red-700 bg-red-50">
-                  {String(error)}
-                </div>
-              )}
-
-              {!loading && !error && detalle && (
-                <>
-                  {pub?.resumen && (
-                    <div className="p-4 rounded-xl border border-slate-200 bg-white">
-                      <div className="text-[11px] uppercase tracking-wide text-slate-500 mb-2">
-                        Resumen
-                      </div>
-                      <p className="text-[13px] text-slate-800 leading-relaxed whitespace-pre-wrap">
-                        {pub.resumen}
-                      </p>
-                    </div>
-                  )}
-
-                  {autores.length > 0 && (
-                    <div>
-                      <div className="text-[11px] uppercase tracking-wide text-slate-500 mb-2">
-                        Autor/Autores
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {autores.map((a, i) => (
-                          <Badge key={i}>{a}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <div className="text-[11px] uppercase tracking-wide text-slate-500 mb-2">
-                      Ficha técnica
-                    </div>
-                    <dl className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
-                      {(porTipo[tipo] ?? [])
-                        .filter(
-                          (i) =>
-                            i.value !== undefined &&
-                            i.value !== null &&
-                            i.value !== "",
-                        )
-                        .map(({ label, value }, i) => (
-                          <div
-                            key={label + i}
-                            className="grid grid-cols-1 sm:grid-cols-[220px_1fr] gap-x-4 gap-y-1 px-4 py-3"
-                          >
-                            <dt className="text-[12px] uppercase tracking-wide text-slate-500">
-                              {label}
-                            </dt>
-                            <dd className="text-[12px] text-slate-800">
-                              {String(value)}
-                            </dd>
-                          </div>
-                        ))}
-                    </dl>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="modal-action mt-4 pt-2 border-t border-slate-200 shrink-0">
-              <button
-                className="btn bg-slate-600 text-white hover:bg-slate-500"
-                onClick={onClose}
-              >
-                Cerrar
-              </button>
-            </div>
-          </section>
+            <section className="record-content-section">
+              <h3>Resumen</h3>
+              <p className="publication-summary">
+                {pub?.resumen ||
+                  "Esta publicación no cuenta con un resumen registrado."}
+              </p>
+            </section>
+            <section className="record-content-section">
+              <h3>Ficha técnica</h3>
+              <RecordFields items={technical} />
+            </section>
+          </article>
         </div>
-      </div>
-    </dialog>
+      )}
+    </section>
   );
 }

@@ -156,13 +156,13 @@ export default function Publicaciones() {
     return libro.filter((l) => {
       if (!q) return true;
       return (
-        String(l.publicacion?.cod_lib ?? "")
+        String(l.libro?.cod_lib ?? "")
           .toLowerCase()
           .includes(q) ||
         (l.publicacion?.titulo ?? "").toLowerCase().includes(q) ||
         (l.publicacion?.autor ?? "").toLowerCase().includes(q) ||
-        (l.publicacion?.genero ?? "").toLowerCase().includes(q) ||
-        (l.publicacion?.edicion ?? "").toLowerCase().includes(q)
+        (l.libro?.genero ?? "").toLowerCase().includes(q) ||
+        (l.libro?.edicion ?? "").toLowerCase().includes(q)
       );
     });
   }, [libro, search]);
@@ -172,12 +172,12 @@ export default function Publicaciones() {
     return articulo.filter((a) => {
       if (!q) return true;
       return (
-        String(a.cod_a ?? "")
+        String(a.articulo?.cod_a ?? "")
           .toLowerCase()
           .includes(q) ||
-        (a.titulo ?? "").toLowerCase().includes(q) ||
-        (a.autor ?? "").toLowerCase().includes(q) ||
-        (a.area ?? "").toLowerCase().includes(q)
+        (a.publicacion?.titulo ?? "").toLowerCase().includes(q) ||
+        (a.publicacion?.autor ?? "").toLowerCase().includes(q) ||
+        (a.articulo?.area ?? "").toLowerCase().includes(q)
       );
     });
   }, [articulo, search]);
@@ -187,12 +187,12 @@ export default function Publicaciones() {
     return tesis.filter((t) => {
       if (!q) return true;
       return (
-        String(t.cod_t ?? "")
+        String(t.tesis?.cod_t ?? "")
           .toLowerCase()
           .includes(q) ||
-        (t.titulo ?? "").toLowerCase().includes(q) ||
-        (t.autor ?? "").toLowerCase().includes(q) ||
-        (t.area ?? "").toLowerCase().includes(q)
+        (t.publicacion?.titulo ?? "").toLowerCase().includes(q) ||
+        (t.publicacion?.autor ?? "").toLowerCase().includes(q) ||
+        (t.tesis?.area ?? "").toLowerCase().includes(q)
       );
     });
   }, [tesis, search]);
@@ -260,7 +260,7 @@ export default function Publicaciones() {
       return {
         ...base,
         articulo: {
-          area: art.area ?? "",
+          area: art.tesis?.area ?? "",
           anio_pub: art.anio_pub ?? "",
           idioma: art.idioma ?? "",
           volumen: art.volumen ?? "",
@@ -288,7 +288,7 @@ export default function Publicaciones() {
     return base;
   }, []);
 
-  // ====== Handlers VER DETALLE (modal) ======
+  // ====== Ver detalle ======
   const handleView = useCallback(
     async (tipoItem, id) => {
       try {
@@ -584,7 +584,14 @@ export default function Publicaciones() {
   // ====== Vista según tipo ======
   const view =
     {
-      Publicacion: <TablePub data={filteredPublicaciones} />,
+      Publicacion: (
+        <TablePub
+          data={filteredPublicaciones}
+          onView={(id, kind) => handleView(kind, id)}
+          onEdit={(id, kind) => handleEdit(kind, id)}
+          onArchive={handleArchivePublicacion}
+        />
+      ),
       Libro: (
         <TableLib
           data={filteredLibros}
@@ -613,77 +620,79 @@ export default function Publicaciones() {
 
   return (
     <div className="feature-page">
-      <PageHeader
-        title="Publicaciones"
-        description="Administra el catálogo, los ejemplares y la información de cada publicación."
-      >
-        <button
-          ref={addBtnRef}
-          type="button"
-          className="btn btn-primary"
-          onClick={() => {
-            document.activeElement?.blur?.();
-            setEditingId(null);
-            setEditingTipo(null);
-            setFormInitialValues(null);
-            setOpenForm(true);
-          }}
+      <div hidden={openForm || openDetalle}>
+        <PageHeader
+          title="Publicaciones"
+          description="Administra el catálogo, los ejemplares y la información de cada publicación."
         >
-          <Plus size={18} />
-          {tipo === "Libro"
-            ? "Nuevo libro"
-            : tipo === "Artículo"
-              ? "Nuevo artículo"
-              : tipo === "Tesis"
-                ? "Nueva tesis"
-                : "Nueva publicación"}
-        </button>
-      </PageHeader>
-      <section className="panel management-panel" aria-label="Publicaciones">
-        <div className="management-toolbar">
-          <Filter
-            value={search}
-            onChange={setSearch}
-            onClear={() => setSearch("")}
-            placeholder="Buscar por ID, título o autor"
-          />
-          <select
-            id="tipo"
-            className="select"
-            aria-label="Tipo de publicación"
-            value={tipo}
-            onChange={(event) => setTipo(event.target.value)}
+          <button
+            ref={addBtnRef}
+            type="button"
+            className="btn btn-primary"
+            onClick={() => {
+              document.activeElement?.blur?.();
+              setEditingId(null);
+              setEditingTipo(null);
+              setFormInitialValues(null);
+              setOpenForm(true);
+            }}
           >
-            <option value="Publicacion">Todos los tipos</option>
-            <option value="Libro">Libro</option>
-            <option value="Artículo">Artículo</option>
-            <option value="Tesis">Tesis</option>
-          </select>
-          <span className="result-count" role="status">
-            {isLoading ? "Cargando…" : `${count} publicaciones`}
-          </span>
-        </div>
-        {uiError && (
-          <div className="alert alert-error" role="alert">
-            Error al cargar: {String(uiError)}
+            <Plus size={18} />
+            {tipo === "Libro"
+              ? "Nuevo libro"
+              : tipo === "Artículo"
+                ? "Nuevo artículo"
+                : tipo === "Tesis"
+                  ? "Nueva tesis"
+                  : "Nueva publicación"}
+          </button>
+        </PageHeader>
+        <section className="panel management-panel" aria-label="Publicaciones">
+          <div className="management-toolbar">
+            <Filter
+              value={search}
+              onChange={setSearch}
+              onClear={() => setSearch("")}
+              placeholder="Buscar por ID, título o autor"
+            />
+            <select
+              id="tipo"
+              className="select"
+              aria-label="Tipo de publicación"
+              value={tipo}
+              onChange={(event) => setTipo(event.target.value)}
+            >
+              <option value="Publicacion">Todos los tipos</option>
+              <option value="Libro">Libro</option>
+              <option value="Artículo">Artículo</option>
+              <option value="Tesis">Tesis</option>
+            </select>
+            <span className="result-count" role="status">
+              {isLoading ? "Cargando…" : `${count} publicaciones`}
+            </span>
           </div>
-        )}
-        {isLoading ? (
-          <div className="empty-state" role="status">
-            Cargando publicaciones…
-          </div>
-        ) : empty ? (
-          <div className="empty-state">
-            <SearchX size={30} />
-            <h2>No encontramos publicaciones</h2>
-            <p>
-              Prueba con otro título o autor, o cambia el tipo seleccionado.
-            </p>
-          </div>
-        ) : (
-          view
-        )}
-      </section>
+          {uiError && (
+            <div className="alert alert-error" role="alert">
+              Error al cargar: {String(uiError)}
+            </div>
+          )}
+          {isLoading ? (
+            <div className="empty-state" role="status">
+              Cargando publicaciones…
+            </div>
+          ) : empty ? (
+            <div className="empty-state">
+              <SearchX size={30} />
+              <h2>No encontramos publicaciones</h2>
+              <p>
+                Prueba con otro título o autor, o cambia el tipo seleccionado.
+              </p>
+            </div>
+          ) : (
+            view
+          )}
+        </section>
+      </div>
       <PublicacionForm
         open={openForm}
         onClose={closeFormAndFocus}

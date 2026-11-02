@@ -556,70 +556,72 @@ export default function Usuario() {
 
   return (
     <div className="feature-page">
-      <PageHeader
-        title="Usuarios"
-        description="Consulta los datos y administra las cuentas de la biblioteca."
-      >
-        <button
-          ref={addBtnRef}
-          type="button"
-          className="btn btn-primary"
-          onClick={() => {
-            document.activeElement?.blur?.();
-            setEditingId(null);
-            setInitialValues(null);
-            setOpen(true);
-          }}
+      <div hidden={open || openDetalle}>
+        <PageHeader
+          title="Usuarios"
+          description="Consulta los datos y administra las cuentas de la biblioteca."
         >
-          <Plus size={18} />
-          Nuevo {safeTipo.toLowerCase()}
-        </button>
-      </PageHeader>
-      <section className="panel management-panel" aria-label="Usuarios">
-        <div className="management-toolbar">
-          <Filter
-            value={search}
-            onChange={setSearch}
-            onClear={() => setSearch("")}
-            placeholder="Buscar por nombre o DNI"
-          />
-          {isAdmin && (
-            <select
-              id="tipo"
-              className="select"
-              aria-label="Tipo de usuario"
-              value={safeTipo}
-              onChange={(event) => setTipo(event.target.value)}
-            >
-              <option value="Lector">Lector</option>
-              <option value="Bibliotecario">Bibliotecario</option>
-            </select>
+          <button
+            ref={addBtnRef}
+            type="button"
+            className="btn btn-primary"
+            onClick={() => {
+              document.activeElement?.blur?.();
+              setEditingId(null);
+              setInitialValues(null);
+              setOpen(true);
+            }}
+          >
+            <Plus size={18} />
+            Nuevo {safeTipo.toLowerCase()}
+          </button>
+        </PageHeader>
+        <section className="panel management-panel" aria-label="Usuarios">
+          <div className="management-toolbar">
+            <Filter
+              value={search}
+              onChange={setSearch}
+              onClear={() => setSearch("")}
+              placeholder="Buscar por nombre o DNI"
+            />
+            {isAdmin && (
+              <select
+                id="tipo"
+                className="select"
+                aria-label="Tipo de usuario"
+                value={safeTipo}
+                onChange={(event) => setTipo(event.target.value)}
+              >
+                <option value="Lector">Lector</option>
+                <option value="Bibliotecario">Bibliotecario</option>
+              </select>
+            )}
+            <span className="result-count" role="status">
+              {isLoading
+                ? "Cargando…"
+                : `${count} ${safeTipo === "Lector" ? "lectores" : "bibliotecarios"}`}
+            </span>
+          </div>
+          {uiError && (
+            <div className="alert alert-error" role="alert">
+              Error al cargar: {String(uiError)}
+            </div>
           )}
-          <span className="result-count" role="status">
-            {isLoading
-              ? "Cargando…"
-              : `${count} ${safeTipo === "Lector" ? "lectores" : "bibliotecarios"}`}
-          </span>
-        </div>
-        {uiError && (
-          <div className="alert alert-error" role="alert">
-            Error al cargar: {String(uiError)}
-          </div>
-        )}
-        {isLoading ? (
-          <div className="empty-state" role="status">
-            Cargando usuarios…
-          </div>
-        ) : count === 0 ? (
-          <div className="empty-state">
-            <SearchX size={30} />
-            <h2>No encontramos usuarios</h2>
-            <p>Prueba con otro nombre o DNI, o limpia la búsqueda.</p>
-          </div>
-        ) : (
-          view
-        )}
-      </section>
+          {isLoading ? (
+            <div className="empty-state" role="status">
+              Cargando usuarios…
+            </div>
+          ) : count === 0 ? (
+            <div className="empty-state">
+              <SearchX size={30} />
+              <h2>No encontramos usuarios</h2>
+              <p>Prueba con otro nombre o DNI, o limpia la búsqueda.</p>
+            </div>
+          ) : (
+            view
+          )}
+        </section>
+      </div>
       <UsuarioForms
         open={open}
         onClose={closeForm}

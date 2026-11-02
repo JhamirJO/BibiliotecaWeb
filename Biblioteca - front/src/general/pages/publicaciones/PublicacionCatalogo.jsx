@@ -43,7 +43,7 @@ export default function PublicacionCatalogo() {
     (s) => s.tesis ?? {},
   );
 
-  // --- modal de detalles ---
+  // --- ficha de publicación ---
   const [openDetalles, setOpenDetalles] = useState(false);
   const [detalleTipo, setDetalleTipo] = useState(null); // "Libro" | "Artículo" | "Tesis"
   const [detalleData, setDetalleData] = useState(null); // entry completo
@@ -159,120 +159,128 @@ export default function PublicacionCatalogo() {
 
   return (
     <div className="feature-page catalog-page">
-      <header className="catalog-intro">
-        <div>
-          <span className="eyebrow">Colección bibliográfica</span>
-          <h1>Encuentra tu próxima lectura.</h1>
-          <p>
-            Explora libros, artículos y tesis. Consulta su información y las
-            copias disponibles en la biblioteca.
-          </p>
-        </div>
-        <div className="catalog-meta">
-          Biblioteca San Marcos
-          <br />
-          Catálogo de publicaciones
-        </div>
-      </header>
-      <div className="catalog-tools">
-        <Filter
-          id="catalog-search"
-          value={filtroTexto}
-          placeholder="Buscar por título o autor"
-          onChange={(value) => {
-            setPage(1);
-            setFiltroTexto(value);
-          }}
-          onClear={() => {
-            setPage(1);
-            setFiltroTexto("");
-          }}
-        />
-        <select
-          aria-label="Tipo de publicación"
-          className="select"
-          value={filtroTipo}
-          onChange={(event) => {
-            setPage(1);
-            setFiltroTipo(event.target.value);
-          }}
-        >
-          <option value="TODOS">Todos los tipos</option>
-          <option value="LIBRO">Libros</option>
-          <option value="ARTICULO">Artículos</option>
-          <option value="TESIS">Tesis</option>
-        </select>
-        <span className="result-count" role="status">
-          {isLoading ? "Cargando…" : `${totalFiltradas} publicaciones`}
-        </span>
-      </div>
-      {isLoading && cards.length === 0 ? (
-        <div className="empty-state" role="status">
-          Cargando catálogo…
-        </div>
-      ) : totalFiltradas === 0 ? (
-        <div className="empty-state">
-          <SearchX size={32} />
-          <h2>No encontramos publicaciones</h2>
-          <p>Prueba con otro título o autor, o cambia el tipo seleccionado.</p>
-        </div>
-      ) : (
-        <div className="catalog-grid">
-          {paginatedCards.map((entry) => {
-            const { kind, publicacion } = entry;
-            const key =
-              kind === "LIBRO"
-                ? `L-${entry.libro?.cod_lib ?? publicacion?.id_pub}`
-                : kind === "ARTICULO"
-                  ? `A-${entry.articulo?.cod_a ?? publicacion?.id_pub}`
-                  : `T-${entry.tesis?.cod_t ?? publicacion?.id_pub}`;
-            const PublicationCard =
-              kind === "LIBRO"
-                ? LibroCard
-                : kind === "ARTICULO"
-                  ? ArticuloCard
-                  : TesisCard;
-            return (
-              <PublicationCard
-                key={key}
-                entry={entry}
-                formatId={formatId}
-                onClickDetalles={handleOpenDetalles}
-              />
-            );
-          })}
-        </div>
-      )}
-      <nav className="catalog-pagination" aria-label="Paginación del catálogo">
-        <span>
-          {totalFiltradas === 0 ? 0 : startIndex + 1}–
-          {Math.min(endIndex, totalFiltradas)} de {totalFiltradas} publicaciones
-          <span className="sr-only">. Filtro: {labelTipo}</span>
-        </span>
-        <div>
-          <button
-            type="button"
-            className="btn btn-ghost btn-square"
-            aria-label="Página anterior"
-            disabled={!canPrev}
-            onClick={() => canPrev && setPage((value) => value - 1)}
+      <div hidden={openDetalles}>
+        <header className="catalog-intro">
+          <div>
+            <span className="eyebrow">Colección bibliográfica</span>
+            <h1>Encuentra tu próxima lectura.</h1>
+            <p>
+              Explora libros, artículos y tesis. Consulta su información y las
+              copias disponibles en la biblioteca.
+            </p>
+          </div>
+          <div className="catalog-meta">
+            Biblioteca San Marcos
+            <br />
+            Catálogo de publicaciones
+          </div>
+        </header>
+        <div className="catalog-tools">
+          <Filter
+            id="catalog-search"
+            value={filtroTexto}
+            placeholder="Buscar por título o autor"
+            onChange={(value) => {
+              setPage(1);
+              setFiltroTexto(value);
+            }}
+            onClear={() => {
+              setPage(1);
+              setFiltroTexto("");
+            }}
+          />
+          <select
+            aria-label="Tipo de publicación"
+            className="select"
+            value={filtroTipo}
+            onChange={(event) => {
+              setPage(1);
+              setFiltroTipo(event.target.value);
+            }}
           >
-            <ArrowLeft size={18} />
-          </button>
-          <span aria-live="polite">
-            {page} / {totalPages}
+            <option value="TODOS">Todos los tipos</option>
+            <option value="LIBRO">Libros</option>
+            <option value="ARTICULO">Artículos</option>
+            <option value="TESIS">Tesis</option>
+          </select>
+          <span className="result-count" role="status">
+            {isLoading ? "Cargando…" : `${totalFiltradas} publicaciones`}
           </span>
-          <button
-            type="button"
-            className="btn btn-ghost btn-square"
-            aria-label="Página siguiente"
-            disabled={!canNext}
-            onClick={() => canNext && setPage((value) => value + 1)}
-          >
-            <ArrowRight size={18} />
-          </button>
         </div>
-      </nav>
+        {isLoading && cards.length === 0 ? (
+          <div className="empty-state" role="status">
+            Cargando catálogo…
+          </div>
+        ) : totalFiltradas === 0 ? (
+          <div className="empty-state">
+            <SearchX size={32} />
+            <h2>No encontramos publicaciones</h2>
+            <p>
+              Prueba con otro título o autor, o cambia el tipo seleccionado.
+            </p>
+          </div>
+        ) : (
+          <div className="catalog-grid">
+            {paginatedCards.map((entry) => {
+              const { kind, publicacion } = entry;
+              const key =
+                kind === "LIBRO"
+                  ? `L-${entry.libro?.cod_lib ?? publicacion?.id_pub}`
+                  : kind === "ARTICULO"
+                    ? `A-${entry.articulo?.cod_a ?? publicacion?.id_pub}`
+                    : `T-${entry.tesis?.cod_t ?? publicacion?.id_pub}`;
+              const PublicationCard =
+                kind === "LIBRO"
+                  ? LibroCard
+                  : kind === "ARTICULO"
+                    ? ArticuloCard
+                    : TesisCard;
+              return (
+                <PublicationCard
+                  key={key}
+                  entry={entry}
+                  formatId={formatId}
+                  onClickDetalles={handleOpenDetalles}
+                />
+              );
+            })}
+          </div>
+        )}
+        <nav
+          className="catalog-pagination"
+          aria-label="Paginación del catálogo"
+        >
+          <span>
+            {totalFiltradas === 0 ? 0 : startIndex + 1}–
+            {Math.min(endIndex, totalFiltradas)} de {totalFiltradas}{" "}
+            publicaciones
+            <span className="sr-only">. Filtro: {labelTipo}</span>
+          </span>
+          <div>
+            <button
+              type="button"
+              className="btn btn-ghost btn-square"
+              aria-label="Página anterior"
+              disabled={!canPrev}
+              onClick={() => canPrev && setPage((value) => value - 1)}
+            >
+              <ArrowLeft size={18} />
+            </button>
+            <span aria-live="polite">
+              {page} / {totalPages}
+            </span>
+            <button
+              type="button"
+              className="btn btn-ghost btn-square"
+              aria-label="Página siguiente"
+              disabled={!canNext}
+              onClick={() => canNext && setPage((value) => value + 1)}
+            >
+              <ArrowRight size={18} />
+            </button>
+          </div>
+        </nav>
+      </div>
       <DetallesPub
         open={openDetalles}
         onClose={handleCloseDetalles}

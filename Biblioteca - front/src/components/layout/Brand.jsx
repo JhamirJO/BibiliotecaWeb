@@ -15,7 +15,6 @@ export default function Brand({ to = "/home", inverse = false }) {
         <span className="brand-name">
           Biblioteca<span className="brand-dot">.</span>
         </span>
-        <span className="brand-sub">Universidad San Marcos</span>
       </span>
     </Link>
   );
